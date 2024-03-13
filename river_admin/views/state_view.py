@@ -7,18 +7,18 @@ from river_admin.views import get, post, delete
 from river_admin.views.serializers import StateDto, CreateStateDto
 
 
-@get(r'^state/get/(?P<pk>\w+)/$')
+@get(r'state/get/<int:pk>/')
 def get_it(request, pk):
     state = get_object_or_404(State.objects.all(), pk=pk)
     return Response(StateDto(state).data, status=HTTP_200_OK)
 
 
-@get(r'^state/list/$')
+@get(r'state/list/')
 def list_it(request):
     return Response(StateDto(State.objects.all(), many=True).data, status=HTTP_200_OK)
 
 
-@post(r'^state/create/$')
+@post(r'state/create/')
 def create_it(request):
     create_state_request = CreateStateDto(data=request.data)
     if create_state_request.is_valid():
@@ -28,7 +28,7 @@ def create_it(request):
         return Response(create_state_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@delete(r'^state/delete/(?P<pk>\w+)/$')
+@delete(r'state/delete/<int:pk>/')
 def delete_it(request, pk):
     state = get_object_or_404(State.objects.all(), pk=pk)
     state.delete()

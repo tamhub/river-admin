@@ -8,20 +8,20 @@ from river_admin.views import get
 from river_admin.views.serializers import TransitionDto, TransitionHookDto, TransitionApprovalDto
 
 
-@get(r'^transition/get/(?P<pk>\w+)/$')
+@get(r'transition/get/<int:pk>/')
 def get_it(request, pk):
     transition = get_object_or_404(Transition.objects.all(), pk=pk)
     return Response(TransitionDto(transition).data, status=HTTP_200_OK)
 
 
-@get(r'^transition/transition-approval/list/(?P<transition_id>\w+)/$')
+@get(r'transition/transition-approval/list/<int:transition_id>/')
 def list_transition_approvals(request, transition_id):
     transition = get_object_or_404(Transition.objects.all(), pk=transition_id)
 
     return Response(TransitionApprovalDto(transition.transition_approvals.all().order_by("transition", "priority"), many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^transition/transition-hook/list/(?P<transition_id>\w+)/$')
+@get(r'transition/transition-hook/list/<int:transition_id>/')
 def list_transition_hooks(request, transition_id):
     transition = get_object_or_404(Transition.objects.all(), pk=transition_id)
     return Response(

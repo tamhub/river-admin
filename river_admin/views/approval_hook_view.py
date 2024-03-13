@@ -8,7 +8,7 @@ from river_admin.views import post, delete
 from river_admin.views.serializers import CreateApprovalHookDto
 
 
-@post(r'^approval-hook/create/$')
+@post(r'approval-hook/create/')
 def create_it(request):
     create_approval_hook_request = CreateApprovalHookDto(data=request.data)
     if create_approval_hook_request.is_valid():
@@ -18,7 +18,7 @@ def create_it(request):
         return Response(create_approval_hook_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@delete(r'^approval-hook/delete/(?P<pk>\w+)/$')
+@delete(r'approval-hook/delete/<int:pk>/')
 def delete_it(request, pk):
     hook = get_object_or_404(OnApprovedHook.objects.all(), pk=pk)
     hook.delete()

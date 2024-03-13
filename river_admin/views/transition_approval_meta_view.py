@@ -6,28 +6,28 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from river.models import TransitionApprovalMeta
 
 from river_admin.views import get, post, delete
-from river_admin.views.serializers import RePrioritizeTransitionApprovalMetaDto, TransitionApprovalMetaDto, CreateTransitionApprovalMetaDto, ApprovalHookDto
+from river_admin.views.serializers import RePrioritizeTransitionApprovalMetaDto, TransitionApprovalMetaDto, \
+    CreateTransitionApprovalMetaDto, ApprovalHookDto
 
-
-@get(r'^transition-approval-meta/get/(?P<pk>\w+)/$')
+get(r'transition-approval-meta/get/<int:pk>/')
 def get_it(request, pk):
     transition_approval_meta = get_object_or_404(TransitionApprovalMeta.objects.all(), pk=pk)
     return Response(TransitionApprovalMetaDto(transition_approval_meta).data, status=HTTP_200_OK)
 
 
-@get(r'^transition-approval-meta/list/$')
+@get(r'transition-approval-meta/list/')
 def list_it(request):
     return Response(TransitionApprovalMetaDto(TransitionApprovalMeta.objects.all(), many=True).data, status=HTTP_200_OK)
 
 
-@delete(r'^transition-approval-meta/delete/(?P<pk>\w+)/$')
+@delete(r'transition-approval-meta/delete/<int:pk>/')
 def delete_it(request, pk):
     transition_approval_meta = get_object_or_404(TransitionApprovalMeta.objects.all(), pk=pk)
     transition_approval_meta.delete()
     return Response(status=HTTP_200_OK)
 
 
-@post(r'^transition-approval-meta/create/$')
+@post(r'transition-approval-meta/create/')
 def create_it(request):
     create_transition_approval_meta_request = CreateTransitionApprovalMetaDto(data=request.data)
     if create_transition_approval_meta_request.is_valid():
@@ -38,7 +38,7 @@ def create_it(request):
 
 
 @transaction.atomic
-@post(r'^transition-approval-meta/re-prioritize/')
+@post(r'transition-approval-meta/re-prioritize/')
 def re_prioritize_it(request):
     re_prioritize_transition_approval_meta_request = RePrioritizeTransitionApprovalMetaDto(data=request.data, many=True)
     if re_prioritize_transition_approval_meta_request.is_valid():
@@ -48,9 +48,11 @@ def re_prioritize_it(request):
             for reprioritize_request in re_prioritize_transition_approval_meta_request.validated_data
         }
 
-        TransitionApprovalMeta.objects.filter(pk__in=request_map.keys()).update(priority=F('priority') + len(request_map.keys()) * 10)
+        TransitionApprovalMeta.objects.filter(pk__in=request_map.keys()).update(
+            priority=F('priority') + len(request_map.keys()) * 10)
         for transition_approval_meta_id, priority in request_map.items():
-            transition_approval_meta = get_object_or_404(TransitionApprovalMeta.objects.all(), pk=transition_approval_meta_id)
+            transition_approval_meta = get_object_or_404(TransitionApprovalMeta.objects.all(),
+                                                         pk=transition_approval_meta_id)
             transition_approval_meta.priority = priority
             transition_approval_meta.save()
 
@@ -59,7 +61,7 @@ def re_prioritize_it(request):
         return Response(re_prioritize_transition_approval_meta_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@get(r'^transition-approval-meta/approval-hook/list/(?P<transition_approval_meta_id>\w+)/$')
+@get(r'transition-approval-meta/approval-hook/list/<int:transition_approval_meta_id>/')
 def list_approval_hooks(request, transition_approval_meta_id):
     transition_approval_meta = get_object_or_404(TransitionApprovalMeta.objects.all(), pk=transition_approval_meta_id)
     return Response(

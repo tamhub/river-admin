@@ -7,19 +7,19 @@ from river_admin.views import get, ApprovalHookDto, Q
 from river_admin.views.serializers import TransitionApprovalDto
 
 
-@get(r'^transition-approval/get/(?P<pk>\w+)/$')
+@get(r'transition-approval/get/<int:pk>/')
 def get_it(request, pk):
     transition_approval = get_object_or_404(TransitionApproval.objects.all(), pk=pk)
     return Response(TransitionApprovalDto(transition_approval).data, status=HTTP_200_OK)
 
 
-@get(r'^transition-approval/get-by-transition/(?P<transition_id>\w+)/$')
+@get(r'transition-approval/get-by-transition/<int:transition_id>/')
 def get_by_transition(request, transition_id):
     transition = get_object_or_404(Transition.objects.all(), pk=transition_id)
     return Response(TransitionApprovalDto(transition.transition_approval.all()).data, status=HTTP_200_OK)
 
 
-@get(r'^transition-approval/approval-hook/list/(?P<transition_approval_id>\w+)/$')
+@get(r'transition-approval/approval-hook/list/<int:transition_approval_id>/')
 def list_approval_hooks(request, transition_approval_id):
     transition_approval = get_object_or_404(TransitionApproval.objects.all(), pk=transition_approval_id)
     return Response(

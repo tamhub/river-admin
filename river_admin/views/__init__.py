@@ -100,6 +100,6 @@ from .transition_approval_view import *
 from .workflow_object_view import *
 
 
-@get(r'^river-admin/$', authentication_classes=[], renderer_classes=[TemplateHTMLRenderer])
+@get(r'river-admin/', authentication_classes=[], renderer_classes=[TemplateHTMLRenderer])
 def index(request):
     return Response({}, template_name="index.html")
