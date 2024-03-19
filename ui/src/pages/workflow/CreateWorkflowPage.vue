@@ -1,9 +1,7 @@
 <template>
   <div>
-    <EmptyState
-      label="Create your initial state"
-      description="Creating your initial state, you'll be able to start designing your workflow."
-    >
+    <EmptyState label="Create your initial statezzzzzz"
+      description="Creating your initial state, you'll be able to start designing your workflow.">
       <template v-slot:icon>mdi-file-tree</template>
       <template v-slot:content>
         <v-row justify="center" align="center">
@@ -17,12 +15,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-btn
-            block
-            color="primary"
-            :disabled="!(workflow && initial_state)"
-            @click="createWorkflow"
-          >Create</v-btn>
+          <v-btn block color="primary" :disabled="!(workflow && initial_state)" @click="createWorkflow">Create</v-btn>
         </v-row>
       </template>
     </EmptyState>
