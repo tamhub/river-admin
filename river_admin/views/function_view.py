@@ -7,18 +7,19 @@ from river_admin.views import get, post, put, delete
 from river_admin.views.serializers import UpdateFunctionDto, CreateFunctionDto, FunctionDto
 
 
-@get(r'^function/get/(?P<pk>\w+)/$')
+# @get(r'^function/get/(?P<pk>\w+)/$')
+@get(r'function/get/<int:pk>/')
 def get_it(request, pk):
     function = get_object_or_404(Function.objects.all(), pk=pk)
     return Response(FunctionDto(function).data, status=HTTP_200_OK)
 
 
-@get(r'^function/list/$')
+@get(r'function/list/')
 def list_it(request):
     return Response(FunctionDto(Function.objects.all(), many=True).data, status=HTTP_200_OK)
 
 
-@post(r'^function/create/')
+@post(r'function/create/')
 def create_it(request):
     create_function_request = CreateFunctionDto(data=request.data)
     if create_function_request.is_valid():
@@ -28,7 +29,8 @@ def create_it(request):
         return Response(create_function_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@put(r'^function/update/(?P<pk>\w+)/$')
+# @put(r'^function/update/(?P<pk>\w+)/$')
+@put(r'function/update/<int:pk>/')
 def update_it(request, pk):
     function = get_object_or_404(Function.objects.all(), pk=pk)
     update_function_request = UpdateFunctionDto(data=request.data, instance=function)
@@ -40,7 +42,7 @@ def update_it(request, pk):
         return Response(update_function_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@delete(r'^function/delete/(?P<pk>\w+)/$')
+@delete(r'function/delete/<int:pk>/')
 def delete_it(request, pk):
     function = get_object_or_404(Function.objects.all(), pk=pk)
     function.delete()

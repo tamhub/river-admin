@@ -11,19 +11,20 @@ from river_admin.views.serializers import WorkflowStateFieldDto, CreateWorkflowD
     TransitionMetaDto, TransitionDto, WorkflowMetadataDto
 
 
-@get(r'^workflow/get/(?P<pk>\w+)/$')
+# @get(r'^workflow/get/(?P<pk>\w+)/$')
+@get(r'workflow/get/<int:pk>/')
 def get_it(request, pk):
     workflow = get_object_or_404(Workflow.objects.all(), pk=pk)
     return Response(WorkflowDto(workflow).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow/list/$')
+@get(r'workflow/list/')
 def list_it(request):
     valid_workflows = [workflow for workflow in Workflow.objects.all() if workflow.content_type.model_class()]
     return Response(WorkflowDto(valid_workflows, many=True).data, status=HTTP_200_OK)
 
 
-@post(r'^workflow/create/$')
+@post(r'workflow/create/')
 def create_it(request):
     create_workflow_request = CreateWorkflowDto(data=request.data)
     if create_workflow_request.is_valid():
@@ -33,14 +34,14 @@ def create_it(request):
         return Response(create_workflow_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@delete(r'^workflow/delete/(?P<pk>\w+)/$')
+@delete(r'workflow/delete/<int:pk>/')
 def delete_it(request, pk):
     workflow = get_object_or_404(Workflow.objects.all(), pk=pk)
     workflow.delete()
     return Response(status=HTTP_200_OK)
 
 
-@get(r'^workflow/state-field/list/$')
+@get(r'workflow/state-field/list/')
 def list_available_state_fields(request):
     class_by_id = lambda cid: workflow_registry.class_index[cid]
     result = []
@@ -58,7 +59,7 @@ def list_available_state_fields(request):
     return Response(WorkflowStateFieldDto(result, many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow/state/list/(?P<workflow_id>\w+)/$')
+@get(r'workflow/state/list/<int:workflow_id>/')
 def list_states(request, workflow_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_id)
     state_ids = set()
@@ -70,20 +71,20 @@ def list_states(request, workflow_id):
     return Response(StateDto(State.objects.filter(pk__in=state_ids), many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow/transition-meta/list/(?P<workflow_id>\w+)/$')
+@get(r'workflow/transition-meta/list/<int:workflow_id>/')
 def list_transition_meta(request, workflow_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_id)
 
     return Response(TransitionMetaDto(workflow.transition_metas.all(), many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow/transition/list/(?P<workflow_id>\w+)/$')
+@get(r'workflow/transition/list/<int:workflow_id>/')
 def list_transitions(request, workflow_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_id)
     return Response(TransitionDto(workflow.transitions.all(), many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow/object/list/(?P<workflow_pk>\w+)/$')
+@get(r'workflow/object/list/<int:workflow_pk>/')
 def list_workflow_objects(request, workflow_pk):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_pk)
     model_class = workflow.content_type.model_class()
@@ -91,7 +92,7 @@ def list_workflow_objects(request, workflow_pk):
     return Response({"headers": registered_admin.admin_list_displays, "workflow_objects": list(registered_admin.get_objects())}, status=HTTP_200_OK)
 
 
-@get(r'^workflow/metadata/$')
+@get(r'workflow/metadata/')
 def get_workflow_metadata(request):
     workflows = []
     for workflow in Workflow.objects.all():
