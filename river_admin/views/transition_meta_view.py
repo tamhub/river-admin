@@ -7,18 +7,18 @@ from river_admin.views import get, post
 from river_admin.views.serializers import TransitionMetaDto, CreateTransitionMetaDto, TransitionHookDto, TransitionApprovalMetaDto
 
 
-@get(r'^transition-meta/get/(?P<pk>\w+)/$')
+@get(r'transition-meta/get/<int:pk>/')
 def get_it(request, pk):
     transition_meta = get_object_or_404(TransitionMeta.objects.all(), pk=pk)
     return Response(TransitionMetaDto(transition_meta).data, status=HTTP_200_OK)
 
 
-@get(r'^transition-meta/list/$')
+@get(r'transition-meta/list/')
 def list_it(request):
     return Response(TransitionMetaDto(TransitionMeta.objects.all(), many=True).data, status=HTTP_200_OK)
 
 
-@post(r'^transition-meta/create/$')
+@post(r'transition-meta/create/')
 def create_it(request):
     create_transition_meta_request = CreateTransitionMetaDto(data=request.data)
     if create_transition_meta_request.is_valid():
@@ -28,7 +28,7 @@ def create_it(request):
         return Response(create_transition_meta_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@get(r'^transition-meta/transition-approval-meta/list/(?P<transition_meta_id>\w+)/$')
+@get(r'transition-meta/transition-approval-meta/list/<int:transition_meta_id>/')
 def list_transition_approval_meta(request, transition_meta_id):
     transition_meta = get_object_or_404(TransitionMeta.objects.all(), pk=transition_meta_id)
 
@@ -41,7 +41,7 @@ def list_transition_approval_meta(request, transition_meta_id):
     )
 
 
-@get(r'^transition-meta/transition-hook/list/(?P<transition_meta_id>\w+)/$')
+@get(r'transition-meta/transition-hook/list/<int:transition_meta_id>/')
 def list_transition_hooks(request, transition_meta_id):
     transition_meta = get_object_or_404(TransitionMeta.objects.all(), pk=transition_meta_id)
     return Response(

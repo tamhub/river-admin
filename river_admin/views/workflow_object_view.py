@@ -8,7 +8,7 @@ from river_admin.views import get, delete
 from river_admin.views.serializers import StateDto, WorkflowObjectStateDto, TransitionDto, TransitionApprovalDto
 
 
-@get(r'^workflow-object/identify/(?P<workflow_pk>\w+)/(?P<object_id>\w+)/$')
+@get(r'workflow-object/identify/<int:workflow_pk>/<int:object_id>/')
 def get_identifier(request, workflow_pk, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_pk)
     model_class = workflow.content_type.model_class()
@@ -16,7 +16,7 @@ def get_identifier(request, workflow_pk, object_id):
     return Response(str(workflow_object), status=status.HTTP_200_OK)
 
 
-@get(r'^workflow-object/current-state/(?P<workflow_pk>\w+)/(?P<object_id>\w+)/$')
+@get(r'workflow-object/current-state/<int:workflow_pk>/<int:object_id>/')
 def get_current_state(request, workflow_pk, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_pk)
     model_class = workflow.content_type.model_class()
@@ -26,7 +26,7 @@ def get_current_state(request, workflow_pk, object_id):
     return Response(StateDto(current_state).data, status=status.HTTP_200_OK)
 
 
-@get(r'^workflow-object/current-iteration/(?P<workflow_pk>\w+)/(?P<object_id>\w+)/$')
+@get(r'workflow-object/current-iteration/<int:workflow_pk>/<int:object_id>/')
 def get_current_iteration(request, workflow_pk, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_pk)
     model_class = workflow.content_type.model_class()
@@ -44,7 +44,7 @@ def get_current_iteration(request, workflow_pk, object_id):
     return Response(last_iteration, status=status.HTTP_200_OK)
 
 
-@delete(r'^workflow-object/delete/(?P<workflow_pk>\w+)/(?P<object_id>\w+)/$')
+@delete(r'workflow-object/delete/<int:workflow_pk>/<int:object_id>/')
 def get_identifier(request, workflow_pk, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_pk)
     model_class = workflow.content_type.model_class()
@@ -53,7 +53,7 @@ def get_identifier(request, workflow_pk, object_id):
     return Response(status=status.HTTP_200_OK)
 
 
-@get(r'^workflow-object/state/list/(?P<workflow_id>\w+)/(?P<object_id>\w+)/$')
+@get(r'workflow-object/state/list/<int:workflow_id>/<int:object_id>/')
 def list_states(request, workflow_id, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_id)
     model_class = workflow.content_type.model_class()
@@ -78,7 +78,7 @@ def list_states(request, workflow_id, object_id):
     return Response(WorkflowObjectStateDto(states, many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow-object/transition/list/(?P<workflow_id>\w+)/(?P<object_id>\w+)/$')
+@get(r'workflow-object/transition/list/<int:workflow_id>/<int:object_id>/')
 def list_transitions(request, workflow_id, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_id)
     model_class = workflow.content_type.model_class()
@@ -87,7 +87,8 @@ def list_transitions(request, workflow_id, object_id):
     return Response(TransitionDto(workflow.transitions.filter(object_id=workflow_object.pk), many=True).data, status=HTTP_200_OK)
 
 
-@get(r'^workflow-object/transition-approval/list/(?P<workflow_id>\w+)/(?P<object_id>\w+)/$')
+# @get(r'^workflow-object/transition-approval/list/(?P<workflow_id>\w+)/(?P<object_id>\w+)/$')
+@get(r'workflow-object/transition-approval/list/<int:workflow_id>/<int:object_id>/')
 def list_transition_approvals(request, workflow_id, object_id):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_id)
     model_class = workflow.content_type.model_class()

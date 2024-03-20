@@ -8,7 +8,7 @@ from river_admin.views import post, delete
 from river_admin.views.serializers import CreateTransitionHookDto
 
 
-@post(r'^transition-hook/create/$')
+@post(r'transition-hook/create/')
 def create_it(request):
     create_transition_hook_request = CreateTransitionHookDto(data=request.data)
     if create_transition_hook_request.is_valid():
@@ -18,7 +18,7 @@ def create_it(request):
         return Response(create_transition_hook_request.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@delete(r'^transition-hook/delete/(?P<pk>\w+)/$')
+@delete(r'transition-hook/delete/<int:pk>/')
 def delete_it(request, pk):
     hook = get_object_or_404(OnTransitHook.objects.all(), pk=pk)
     hook.delete()
