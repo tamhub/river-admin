@@ -1,6 +1,6 @@
 <template>
   <div>
-    <EmptyState label="Create your initial statezzzzzz"
+    <EmptyState label="Create your initial state"
       description="Creating your initial state, you'll be able to start designing your workflow.">
       <template v-slot:icon>mdi-file-tree</template>
       <template v-slot:content>

@@ -3,8 +3,8 @@
   "version": "0.7.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "set NODE_OPTIONS=--openssl-legacy-provider &&  vue-cli-service serve",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider &&  vue-cli-service build",
     "_fix_html": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' ./river_admin/templates/index.html",
     "_fix_js": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' $(find ./river_admin/static/ -type f -iname '*.js')",
     "_fix_js_map": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' $(find ./river_admin/static/ -type f -iname '*.js.map')",
@@ -23,6 +23,7 @@
     "d3-tip": "^0.9.1",
     "dagre-d3": "^0.6.3",
     "minimist": "^1.2.2",
+    "radix-vue": "^1.5.3",
     "serialize-javascript": "^3.1.0",
     "vue": "^2.6.10",
     "vue-codemirror": "^4.0.6",
@@ -40,6 +41,7 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "vue-svg-loader": "^0.16.0",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
