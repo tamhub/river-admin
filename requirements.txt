@@ -3,7 +3,7 @@ mock==2.0.0
 pyhamcrest==1.9.0
 djangorestframework
 django-cors-headers
-git+https://github.com/tamhub/django-river@master
+django-river @ git+https://github.com/tamhub/django-river@2edd530bbdae0d8d2ee3fd2d4152fe742c176e73
 django-heroku
 psycopg2
 gunicorn
