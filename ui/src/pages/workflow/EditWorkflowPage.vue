@@ -1,50 +1,32 @@
 <template>
   <div>
-    <v-container v-if="initialized" fluid>
+    <v-container v-if="initialized">
       <v-row>
-        <v-col></v-col>
-        <v-col justify="center" align="center">
-          <h1>
-            Workflow for
-            <v-chip>{{ workflow.identifier }}</v-chip>
-          </h1>
+        <v-col justify="between" align="between">
+          <h3>
+            Workflow
+            <!-- <v-chip>{{ workflow.identifier }}</v-chip> -->
+          </h3>
         </v-col>
-        <v-col justify="center" align="end">
-          <v-btn
-            class="mr-5"
-            :disabled="transitions.length==0"
-            color="primary"
-            @click="goToEditWorkflowRules"
-          >Edit Workflow Rules</v-btn>
-        </v-col>
+        <!-- <v-col justify="center" align="end">
+          <v-btn class="mr-5" :disabled="transitions.length == 0" color="primary" @click="goToEditWorkflowRules">Edit
+            Workflow Rules</v-btn>
+        </v-col> -->
       </v-row>
       <v-row>
         <v-col cols="12">
-          <WorkflowIllustration
-            :states="states"
-            :transitions="transitions"
-            :state_class_mapping="state_class_mapping"
-            :editable="true"
-            @on-transition-selected="onTransitionSelected"
-            @on-state-clicked="onStateSelected"
-          />
+          <WorkflowIllustration :states="states" :transitions="transitions" :state_class_mapping="state_class_mapping"
+            :editable="true" @on-transition-selected="onTransitionSelected" @on-state-clicked="onStateSelected" />
         </v-col>
       </v-row>
       <v-row justify="center" align="center">
         <v-col cols="6">
-          <StateInput
-            :disabled="!selected_state"
-            v-model="new_transition_state"
-            :placeholder="selected_state?`New state from '${selected_state.label}':`:'Select a state to creat a transition'"
-          />
+          <StateInput :disabled="!selected_state" v-model="new_transition_state"
+            :placeholder="selected_state ? `New state from '${selected_state.label}':` : 'Select a state to creat a transition'" />
         </v-col>
         <v-col cols="1">
-          <v-btn
-            :disabled="!selected_state || !new_transition_state"
-            large
-            color="primary"
-            @click="createState"
-          >Create</v-btn>
+          <v-btn :disabled="!selected_state || !new_transition_state" large color="primary"
+            @click="createState">Create</v-btn>
         </v-col>
       </v-row>
     </v-container>

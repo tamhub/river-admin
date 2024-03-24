@@ -1,15 +1,16 @@
 <template>
-  <v-card v-resize="onResize" class="mx-auto pa-5" :elevation="6">
+  <div v-resize="onResize" class="w-full bg-[#E9E9E9] rounded-[20px] relative" style="height: calc(100vh - 300px);">
+    <span class="absolute top-0 left-0 px-6 py-4 text-[#A0A2A7]">Diagram</span>
     <v-card-text>
       <v-container fluid>
         <v-row justify="center" align="center">
           <v-col id="svg-container" justify="center" align="center">
-            <svg width="650" height="270" class="shadow" />
+            <svg width="650" height="270" class=" "></svg>
           </v-col>
         </v-row>
       </v-container>
     </v-card-text>
-  </v-card>
+  </div>
 </template>
 
 <script>
@@ -74,7 +75,7 @@ export default {
         this.svg = el.select("svg");
         this.svgGroup = this.svg.append("g");
 
-        this.graph = new dagreD3.graphlib.Graph().setGraph({}).setDefaultEdgeLabel(function() {
+        this.graph = new dagreD3.graphlib.Graph().setGraph({}).setDefaultEdgeLabel(function () {
           return {};
         });
 
@@ -87,7 +88,8 @@ export default {
       this.graph.setNode(state.id, {
         label: state.label,
         class: "node-default",
-        id: `state_${state.id}`
+        id: `state_${state.id}`,
+
       });
     },
 
@@ -101,11 +103,11 @@ export default {
 
     _destroySketchComponents() {
       var g = this.graph;
-      this.graph.nodes().forEach(function(v) {
+      this.graph.nodes().forEach(function (v) {
         g.removeNode(v);
       });
 
-      this.graph.edges().forEach(function(v) {
+      this.graph.edges().forEach(function (v) {
         g.removeEdge(v);
       });
 
@@ -130,6 +132,9 @@ export default {
         var el = d3.select(this.$el);
         var inner = el.select("svg g");
         render(inner, this.graph);
+        inner.selectAll("g.node rect").attr("rx", "20").attr("ry", "20");
+
+
 
         this._reCenterSketch();
         if (this.editable) {
@@ -144,7 +149,7 @@ export default {
     _setNodeOnclicks() {
       var that = this;
       this.states.forEach(state => {
-        d3.select(`g#state_${state.id} rect`).on("click", function() {
+        d3.select(`g#state_${state.id} rect`).on("click", function () {
           that.$emit("on-state-clicked", that._get_state_by_id(state.id));
         });
       });
@@ -166,7 +171,7 @@ export default {
           .append("path")
           .attr("d", edge_container.select("path").attr("d"))
           .classed("clickable-edge", true)
-          .on("click", function() {
+          .on("click", function () {
             if (transition) {
               that._unselectEdge();
               that.selected_transition_id = transition.id;
@@ -199,7 +204,7 @@ export default {
         .tip()
         .attr("class", "d3-tip")
         .offset([-10, 0])
-        .html(function(d) {
+        .html(function (d) {
           var state = that.states.find(state => state.id == d);
           if (state) {
             var label_html = `<div class="label-tooltip"><strong>${state.label}</strong></div>`;
@@ -259,7 +264,7 @@ export default {
     },
     _roundNodeCorners() {
       var g = this.graph;
-      this.graph.nodes().forEach(function(v) {
+      this.graph.nodes().forEach(function (v) {
         var node = g.node(v);
         node.rx = node.ry = 5;
       });
@@ -278,22 +283,38 @@ export default {
 
 
 <style>
-g.node-default > rect {
+g.node-default {
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  user-select: none;
+}
+
+g.node-default>rect {
   fill: #dddd;
   stroke: black;
   stroke-width: 0.3px;
+  -webkit-filter: drop-shadow(0px 0px 10px 0px #0000000A);
+  filter: drop-shadow(0px 0px 10px 0px #0000000A);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
-g.node-default > g.label {
-  stroke: black;
+g.node-default>g.label {
+  /* stroke: black !important; */
+  stroke-width: 0.3px !important;
 }
 
-g.edge-SELECTED > path.path {
+g.edge-SELECTED>rect {
+  stroke: deepskyblue !important;
+  stroke-width: 2.5px !important;
+}
+
+g.edge-SELECTED>path.path {
   stroke: deepskyblue !important;
   stroke-width: 2.5;
 }
 
-g.edge-UNSELECTED > path.path {
+g.edge-UNSELECTED>path.path {
   stroke: #000 !important;
   stroke-width: 1.5px;
 }
@@ -303,7 +324,7 @@ g.edge-label-SELECTED tspan {
   stroke-width: 2;
 }
 
-g.edge-UNSELECTED > path {
+g.edge-UNSELECTED>path {
   fill: #dddd;
 }
 
@@ -337,9 +358,9 @@ text {
   padding-right: 25px;
 }
 
-.shadow {
-  -webkit-filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.5));
-  filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.5));
+.shadow>* {
+
+
   /* Similar syntax to box-shadow */
 }
 

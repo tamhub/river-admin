@@ -6,16 +6,10 @@
       </v-col>
     </v-row>
 
-    <v-snackbar
-      class="mt-10"
-      v-model="show_snackbar"
-      :color="snackbar_color"
-      :top="true"
-      :timeout="snackbar_timeout"
-    >
+    <v-snackbar class="mt-10" v-model="show_snackbar" :color="snackbar_color" :top="true" :timeout="snackbar_timeout">
       <v-icon color="white" left>{{ snackbar_icon }}</v-icon>
       <v-container>
-        <v-row v-for="(snackbar_text,index) in snackbar_texts" v-bind:key="index">
+        <v-row v-for="(snackbar_text, index) in snackbar_texts" v-bind:key="index">
           <v-col>{{ snackbar_text }}</v-col>
         </v-row>
       </v-container>
@@ -95,6 +89,34 @@ export default {
 </script>
 
 <style>
+/* .row {
+  width: 100%;
+}*/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #121722;
+}
+
+.flex {
+  flex-wrap: wrap;
+}
+
+.v-btn__content {
+  display: flex;
+  gap: 5px;
+}
+
+g.node-default>rect {
+  fill: #fff !important;
+  stroke: #D2D2D2 !important;
+  stroke-width: 1px !important;
+  border-radius: 50% !important;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
