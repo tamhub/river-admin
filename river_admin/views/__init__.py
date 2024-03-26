@@ -2,8 +2,8 @@ from django.db import IntegrityError
 from django.db.models import ProtectedError
 from rest_framework import serializers
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view, authentication_classes, renderer_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, authentication_classes, renderer_classes, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.views import exception_handler as drf_exception_handler
 
@@ -16,9 +16,19 @@ def _path(path, method, **options):
     def decorator(view):
         authentications = options.get("authentication_classes", [TokenAuthentication])
         renderers = options.get("renderer_classes", [JSONRenderer])
-        new_view = api_view([method])(authentication_classes(authentications)(renderer_classes(renderers)(view)))
-        urls.append(django_path(path, new_view))
-        return new_view
+        permissions = options.get("permission_classes", [IsAuthenticated])
+        # Apply decorators
+        decorated_view = api_view([method])(
+            authentication_classes(authentications)(
+                permission_classes(permissions)(
+                    renderer_classes(renderers)(
+                        view
+                    )
+                )
+            )
+        )
+        urls.append(django_path(path, decorated_view))
+        return decorated_view
 
     return decorator
 
