@@ -3,7 +3,7 @@
     <v-container v-if="initialized">
       <v-row>
         <v-col justify="between" align="between">
-          <h3>
+          <h3 class="font-bold">
             Workflow
             <!-- <v-chip>{{ workflow.identifier }}</v-chip> -->
           </h3>
@@ -19,16 +19,29 @@
             :editable="true" @on-transition-selected="onTransitionSelected" @on-state-clicked="onStateSelected" />
         </v-col>
       </v-row>
-      <v-row justify="center" align="center">
-        <v-col cols="6">
+      <div class="flex items-start justify-start gap-3 pt-2">
+        <div class="max-w-[500px] w-full">
           <StateInput :disabled="!selected_state" v-model="new_transition_state"
             :placeholder="selected_state ? `New state from '${selected_state.label}':` : 'Select a state to creat a transition'" />
-        </v-col>
-        <v-col cols="1">
-          <v-btn :disabled="!selected_state || !new_transition_state" large color="primary"
-            @click="createState">Create</v-btn>
-        </v-col>
-      </v-row>
+        </div>
+        <div>
+          <v-btn class="rounded-full mt-0.5" :disabled="!selected_state || !new_transition_state" large color="primary"
+            @click="createState">
+
+            <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M8.50004 15.25C12.1819 15.25 15.1667 12.2653 15.1667 8.58335C15.1667 4.90146 12.1819 1.91669 8.50004 1.91669C4.81814 1.91669 1.83337 4.90146 1.83337 8.58335C1.83337 12.2653 4.81814 15.25 8.50004 15.25Z"
+                stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M8.5 5.91669V11.25" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M5.83337 8.58337H11.1667" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="font-bold capitalize">
+
+              Add state
+            </span>
+          </v-btn>
+        </div>
+      </div>
     </v-container>
   </div>
 </template>
@@ -58,18 +71,18 @@ export default {
     state_class_mapping: {},
     selected_state_class: {
       rect: {
-        fill: "deepskyblue"
+        fill: "black"
       },
       label: {
-        stroke: "white"
+        stroke: "black"
       }
     },
     default_state_class: {
       rect: {
-        fill: "#dddd"
+        fill: "black"
       },
       label: {
-        stroke: "black"
+        stroke: ""
       }
     }
   }),

@@ -122,4 +122,12 @@ g.node-default>rect {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@media (min-width: 2000px) {
+  .container {
+    margin-left: 0px !important;
+    max-width: 100% !important;
+
+  }
+}
 </style>

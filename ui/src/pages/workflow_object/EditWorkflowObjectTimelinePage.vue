@@ -10,13 +10,8 @@
       <v-row>
         <v-flex xs12 sm12 md6>
           <v-container>
-            <WorkflowIllustration
-              :states="states"
-              :transitions="transitions"
-              :editable="false"
-              :state_class_mapping="state_class_mapping"
-              @on-transition-selected="on_transition_selected"
-            />
+            <WorkflowIllustration :states="states" :transitions="transitions" :editable="false"
+              :state_class_mapping="state_class_mapping" @on-transition-selected="on_transition_selected" />
           </v-container>
         </v-flex>
         <v-flex xs12 sm12 md6>
@@ -32,20 +27,12 @@
                           <span v-text="get_state_by(selected_transition.source_state_id).label"></span>
                         </v-chip>to
                         <v-chip color="primary" class="white--text">
-                          <span
-                            v-text="get_state_by(selected_transition.destination_state_id).label "
-                          ></span>
+                          <span v-text="get_state_by(selected_transition.destination_state_id).label"></span>
                         </v-chip>
                       </v-col>
                       <div class="flex-grow-1" />
                       <v-col v-if="!selected_transition.is_done && !readonly">
-                        <v-speed-dial
-                          v-model="fab"
-                          :bottom="true"
-                          :right="true"
-                          direction="left"
-                          :open-on-hover="true"
-                        >
+                        <v-speed-dial v-model="fab" :bottom="true" :right="true" direction="left" :open-on-hover="true">
                           <template v-slot:activator>
                             <v-btn v-model="fab" color="primary" dark fab>
                               <v-icon v-if="fab">mdi-close</v-icon>
@@ -55,14 +42,7 @@
 
                           <v-tooltip top>
                             <template v-slot:activator="{ on }">
-                              <v-btn
-                                fab
-                                dark
-                                small
-                                v-on="on"
-                                color="green"
-                                @click="newTransitionHookDialog=true"
-                              >
+                              <v-btn fab dark small v-on="on" color="green" @click="newTransitionHookDialog = true">
                                 <v-icon>mdi-function-variant</v-icon>
                               </v-btn>
                             </template>
@@ -73,24 +53,15 @@
                     </v-row>
                   </v-card-title>
                   <v-card-text>
-                    <ObjectApprovalList
-                      :workflow="workflow"
-                      :object_id="$route.params.object_id"
-                      :object_approvals="selected_transition.approvals"
-                      :editable="!readonly"
-                      @on-hook-create="on_approval_hook_created"
-                      @on-hook-delete="on_approval_hook_deleted"
-                    />
-                    <div v-if="selected_transition.hooks.length>0">
+                    <ObjectApprovalList :workflow="workflow" :object_id="$route.params.object_id"
+                      :object_approvals="selected_transition.approvals" :editable="!readonly"
+                      @on-hook-create="on_approval_hook_created" @on-hook-delete="on_approval_hook_deleted" />
+                    <div v-if="selected_transition.hooks.length > 0">
                       <v-divider />
                       <span class="title font-weight-light">Right before the transition happens</span>
                       <div v-for="(hook) in selected_transition.hooks" :key="hook.id">
-                        <HookDetail
-                          class="my-1"
-                          :hook="hook"
-                          :editable="!hook.is_from_upstream() && !readonly"
-                          @on-delete="on_transition_hook_deleted"
-                        />
+                        <HookDetail class="my-1" :hook="hook" :editable="!hook.is_from_upstream() && !readonly"
+                          @on-delete="on_transition_hook_deleted" />
                       </div>
                     </div>
                   </v-card-text>
@@ -99,10 +70,8 @@
             </v-row>
           </v-container>
           <v-container v-else>
-            <EmptyState
-              label="Select an uncancelled transition"
-              description="Selecting a transition by clicking the arrow, you'll be able to create transition steps."
-            >
+            <EmptyState label="Select an uncancelled transition"
+              description="Selecting a transition by clicking the arrow, you'll be able to create transition steps.">
               <template v-slot:icon>mdi-mouse</template>
             </EmptyState>
           </v-container>
@@ -110,19 +79,11 @@
       </v-row>
     </v-container>
 
-    <v-dialog
-      v-model="newTransitionHookDialog"
-      max-width="800"
-      v-if="!readonly && selected_transition"
-    >
-      <CreateTransitionHookForm
-        :workflow="workflow"
-        :transition_meta="selected_transition.transition_meta"
-        :transition="selected_transition.id"
-        :object_id="$route.params.object_id"
+    <v-dialog v-model="newTransitionHookDialog" max-width="800" v-if="!readonly && selected_transition">
+      <CreateTransitionHookForm :workflow="workflow" :transition_meta="selected_transition.transition_meta"
+        :transition="selected_transition.id" :object_id="$route.params.object_id"
         :excluded_function_ids="selected_transition.hooks.map(hook => hook.callback_function.id)"
-        @on-create="on_transition_hook_created"
-      />
+        @on-create="on_transition_hook_created" />
     </v-dialog>
 
     <v-dialog v-if="deletingApprovalHook" v-model="deletingApprovalHookDialog" max-width="50%">

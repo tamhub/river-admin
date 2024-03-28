@@ -1,149 +1,186 @@
 <template>
   <div>
-    <v-container fluid v-if="initialized">
+    <v-container v-if="initialized">
       <v-row>
-        <v-col justify="center" align="center">
-          <h1>
-            Workflow for
-            <v-chip>{{ workflow.identifier }}</v-chip>
-          </h1>
+        <v-col justify="between" align="between">
+          <h3 class="font-bold">
+            Workflow
+            <!-- <v-chip>{{ workflow.identifier }}</v-chip> -->
+          </h3>
         </v-col>
       </v-row>
       <v-row>
-        <v-flex xs12 sm12 md6>
+        <v-flex xs12 sm12 md8>
           <v-container>
-            <WorkflowIllustration
-              :states="states"
-              :transitions="transitions"
-              :editable="true"
-              @on-transition-selected="on_transition_selected"
-            />
+            <WorkflowIllustration :states="states" :transitions="transitions" :editable="true"
+              @on-transition-selected="on_transition_selected" />
           </v-container>
         </v-flex>
-        <v-flex xs12 sm12 md6>
-          <v-container v-if="selected_transition">
-            <v-row>
-              <v-col>
-                <v-card class="pa-5" :elevation="6">
-                  <v-card-title>
-                    <v-row>
-                      <v-col cols="9">
-                        Transition steps from
-                        <v-chip color="primary" class="white--text">
-                          <span v-text="get_state_by(selected_transition.source_state_id).label"></span>
-                        </v-chip>to
-                        <v-chip color="primary" class="white--text">
-                          <span
-                            v-text="get_state_by(selected_transition.destination_state_id).label "
-                          ></span>
-                        </v-chip>
-                      </v-col>
-                      <div class="flex-grow-1" />
-                      <v-col v-if="!readonly">
-                        <v-speed-dial
-                          v-model="fab"
-                          :bottom="true"
-                          :right="true"
-                          direction="left"
-                          :open-on-hover="true"
-                        >
-                          <template v-slot:activator>
-                            <v-btn v-model="fab" color="primary" dark fab>
-                              <v-icon v-if="fab">mdi-close</v-icon>
-                              <v-icon v-else>mdi-plus</v-icon>
-                            </v-btn>
-                          </template>
+        <v-flex class="py-3 pr-4" xs12 sm12 md4>
+          <div class="border border-[#E4E4E4] rounded-[20px] bg-[#FAFAFA] w-full" style="box-shadow: 0px 0px 64px 0px #D2D2D23D inset;
 
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on }">
-                              <v-btn
-                                fab
-                                dark
-                                small
-                                v-on="on"
-                                color="green"
-                                @click="newTransitionHookDialog=true"
-                              >
-                                <v-icon>mdi-function-variant</v-icon>
-                              </v-btn>
-                            </template>
-                            <span>Create Transition Hook</span>
-                          </v-tooltip>
+box-shadow: -2px 7px 16px 0px #BFBFBF1A;
 
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on }">
-                              <v-btn
-                                fab
-                                dark
-                                small
-                                v-on="on"
-                                color="green"
-                                @click="newApprovalDialog=true"
-                              >
-                                <v-icon>mdi-account-multiple-check</v-icon>
-                              </v-btn>
-                            </template>
-                            <span>Create Approval Step</span>
-                          </v-tooltip>
-                        </v-speed-dial>
-                      </v-col>
-                    </v-row>
-                  </v-card-title>
-                  <v-card-text>
-                    <ApprovalList
-                      :workflow="workflow"
-                      :approvals="selected_transition.approvals"
-                      :editable="!readonly"
-                      @on-delete="on_approval_deleted"
-                      @on-order-change="on_approvals_order_change"
-                      @on-hook-create="on_approval_hook_created"
-                      @on-hook-delete="on_approval_hook_deleted"
-                    />
-                    <div v-if="selected_transition.hooks.length>0">
-                      <v-divider />
-                      <span class="title font-weight-light">Right before the transition happens</span>
-                      <div v-for="(hook,index) in selected_transition.hooks" :key="hook.id">
-                        <HookDetail
-                          :hook="hook"
-                          :editable="!readonly"
-                          @on-delete="on_transition_hook_deleted"
-                        />
+box-shadow: -59px 170px 50px 0px #BFBFBF00;
+">
+
+
+            <div class="w-full h-full" v-if="selected_transition">
+              <div class="h-full flex flex-col pb-5">
+                <div class="w-full py-3 px-4">
+                  <div class="w-full h-full">
+                    <span class="text-[#A0A2A7] text-base">Transition</span>
+                    <div
+                      class="flex items-center justify-start flex-nowrap gap-1 w-full pt-2 pb-4 border-b border-[#DBDBDB]">
+
+                      <div
+                        class="bg-[#EFECFF] text-base text-[#5E45FF] max-w-[calc(50%-20px)] px-2.5 py-1 rounded-full truncate select-none">
+                        <span v-text="get_state_by(selected_transition.source_state_id).label"></span>
+                      </div>
+                      <span class="text-base">
+                        to
+                      </span>
+                      <div
+                        class="bg-[#EFECFF] text-base text-[#5E45FF] max-w-[calc(50%-20px)] px-2.5 py-1 rounded-full truncate select-none">
+                        <span v-text="get_state_by(selected_transition.destination_state_id).label"></span>
                       </div>
                     </div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-container>
-          <v-container v-else-if="!readonly">
-            <EmptyState
-              label="Select a transition"
-              description="Selecting a transition by clicking the arrow, you'll be able to create the rules."
-            >
-              <template v-slot:icon>mdi-mouse</template>
-            </EmptyState>
-          </v-container>
+                  </div>
+                  <div class="flex-grow-1"></div>
+
+
+                </div>
+                <div class="">
+                  <ApprovalList :workflow="workflow" :approvals="selected_transition.approvals" :editable="!readonly"
+                    @on-delete="on_approval_deleted" @on-order-change="on_approvals_order_change"
+                    @on-hook-create="on_approval_hook_created" @on-hook-delete="on_approval_hook_deleted" />
+
+                </div>
+                <div class="w-full px-6 mt-auto">
+                  <div class=" flex pb-5" v-if="selected_transition.hooks.length > 0">
+
+                    <div class="px-4 bg-white rounded-lg shadow-md py-3 w-full">
+
+                      <span class=" flex items-center justify-between pb-5">
+                        <span class="flex items-center justify-start gap-2 text-[#595D64] text-base ">
+                          <svg width="14" height="16" viewBox="0 0 14 16" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.66667 1.33325L1 9.33325H7L6.33333 14.6666L13 6.66658H7L7.66667 1.33325Z"
+                              stroke="#595D64" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+
+                          Before completing the transition...
+                        </span>
+
+                        <button @click="allowEditingHooks = !allowEditingHooks">
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_24_1831)">
+                              <path
+                                d="M11.334 2.00004C11.5091 1.82494 11.7169 1.68605 11.9457 1.59129C12.1745 1.49653 12.4197 1.44775 12.6673 1.44775C12.9149 1.44775 13.1601 1.49653 13.3889 1.59129C13.6177 1.68605 13.8256 1.82494 14.0007 2.00004C14.1757 2.17513 14.3146 2.383 14.4094 2.61178C14.5042 2.84055 14.5529 3.08575 14.5529 3.33337C14.5529 3.58099 14.5042 3.82619 14.4094 4.05497C14.3146 4.28374 14.1757 4.49161 14.0007 4.66671L5.00065 13.6667L1.33398 14.6667L2.33398 11L11.334 2.00004Z"
+                                stroke="#121722" stroke-linecap="round" stroke-linejoin="round" />
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_24_1831">
+                                <rect width="16" height="16" fill="white" />
+                              </clipPath>
+                            </defs>
+                          </svg>
+
+                        </button>
+
+                      </span>
+                      <div class="flex gap-2">
+
+                        <div v-for="(hook, index) in selected_transition.hooks" :key="hook.id">
+                          <HookDetail :hook="hook" :editable="!readonly && allowEditingHooks"
+                            @on-delete="on_transition_hook_deleted" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <v-speed-dial v-if="!readonly" v-model="fab" direction="top">
+                    <template v-slot:activator>
+                      <v-btn large v-model="fab" color="primary" class="rounded-full w-full">
+                        <span class="w-full flex items-center justify-between gap-1 ">
+                          <svg width="17" height="17" viewBox="0 0 17 17" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M8.50004 15.25C12.1819 15.25 15.1667 12.2653 15.1667 8.58335C15.1667 4.90146 12.1819 1.91669 8.50004 1.91669C4.81814 1.91669 1.83337 4.90146 1.83337 8.58335C1.83337 12.2653 4.81814 15.25 8.50004 15.25Z"
+                              stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M8.5 5.91669V11.25" stroke="white" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                            <path d="M5.83337 8.58337H11.1667" stroke="white" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                          </svg>
+                          <span class="font-bold capitalize">
+
+                            Add
+                          </span>
+                          <span></span>
+                        </span>
+                      </v-btn>
+                    </template>
+
+                    <div class="flex flex-col w-full rounded-3xl shadow overflow-hidden approval-shadow" top>
+
+                      <button class="flex w-full bg-white items-center justify-start gap-4 p-5"
+                        @click="newApprovalDialog = true">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <g clip-path="url(#clip0_23_515)">
+                            <path
+                              d="M14.6666 7.38674V8.00007C14.6658 9.43769 14.2003 10.8365 13.3395 11.988C12.4787 13.1394 11.2688 13.9817 9.89016 14.3893C8.51154 14.797 7.03809 14.748 5.68957 14.2498C4.34104 13.7516 3.18969 12.8308 2.40723 11.6248C1.62476 10.4188 1.25311 8.99212 1.3477 7.55762C1.44229 6.12312 1.99806 4.75762 2.93211 3.66479C3.86615 2.57195 5.12844 1.81033 6.53071 1.4935C7.93298 1.17668 9.4001 1.32163 10.7133 1.90674"
+                              stroke="#A0A2A7" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M14.6667 2.66675L8 9.34008L6 7.34008" stroke="#A0A2A7" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_23_515">
+                              <rect width="16" height="16" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+
+                        <span>Add Approval Step</span>
+                      </button>
+
+                      <span class="w-full h-[1px] bg-[#F1F1F1]"></span>
+                      <button class="flex w-full bg-white items-center justify-start gap-4 p-5"
+                        @click="newTransitionHookDialog = true">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8.66667 1.33325L2 9.33325H8L7.33333 14.6666L14 6.66658H8L8.66667 1.33325Z"
+                            stroke="#5E45FF" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+
+                        <span>Add Transition Hook</span>
+                      </button>
+
+                    </div>
+
+
+
+                  </v-speed-dial>
+                </div>
+              </div>
+            </div>
+            <div class="px-2 py-2" v-else-if="!readonly">
+              <EmptyState label="Select a transition"
+                description="Selecting a transition by clicking the arrow, you'll be able to create the rules.">
+                <template v-slot:icon>mdi-mouse</template>
+              </EmptyState>
+            </div>
+          </div>
         </v-flex>
       </v-row>
     </v-container>
     <v-dialog v-model="newApprovalDialog" max-width="800" v-if="!readonly && selected_transition">
-      <CreateApprovalForm
-        :workflow="workflow"
-        :transition_id="selected_transition.id"
-        @on-create="on_approval_created"
-      />
+      <CreateApprovalForm :workflow="workflow" :transition_id="selected_transition.id"
+        @on-create="on_approval_created" />
     </v-dialog>
-    <v-dialog
-      v-model="newTransitionHookDialog"
-      max-width="800"
-      v-if="!readonly && selected_transition"
-    >
-      <CreateTransitionHookForm
-        :workflow="workflow"
-        :transition_meta="selected_transition.id"
+    <v-dialog v-model="newTransitionHookDialog" max-width="800" v-if="!readonly && selected_transition">
+      <CreateTransitionHookForm :workflow="workflow" :transition_meta="selected_transition.id"
         :excluded_function_ids="selected_transition.hooks.map(hook => hook.callback_function.id)"
-        @on-create="on_transition_hook_created"
-      />
+        @on-create="on_transition_hook_created" />
     </v-dialog>
   </div>
 </template>
@@ -179,7 +216,8 @@ export default {
     selected_transition: null,
     states: [],
     transitions: [],
-    alert_timeout: 2000
+    alert_timeout: 2000,
+    allowEditingHooks: false
   }),
   mounted() {
     var workflow_id = this.$route.params.id;
@@ -408,5 +446,26 @@ export default {
   bottom: 45px;
   right: 30px;
   z-index: 10;
+}
+
+.v-chip__content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Prevents the text from wrapping */
+  width: 100%;
+}
+
+.approval-shadow {
+  box-shadow: -2px 7px 16px 0px #BFBFBF1A;
+
+  box-shadow: -10px 27px 29px 0px #BFBFBF17;
+
+  box-shadow: -21px 61px 39px 0px #BFBFBF0D;
+
+  box-shadow: -38px 109px 46px 0px #BFBFBF03;
+
+  box-shadow: -59px 170px 50px 0px #BFBFBF00;
+
 }
 </style>
