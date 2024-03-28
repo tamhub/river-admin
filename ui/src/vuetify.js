@@ -6,7 +6,7 @@ import "@mdi/font/css/materialdesignicons.css";
 Vue.use(Vuetify);
 
 const opts = {
-  iconfont: "mdi",
+  iconfont: "fa",
   theme: {
     themes: {
       light: {

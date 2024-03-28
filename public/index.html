@@ -7,7 +7,22 @@
     <link rel="icon" href="/static/favicon.ico">
     <title>River Admin</title>
     <script src="https://cdn.tailwindcss.com" defer></script>
-    <script src="./tailwind.config.js" defer></script>      
+    <script>
+      tailwind.config = {
+  corePlugins: {
+    preflight: false,
+  },
+  theme: {
+    container: {
+      center: false,
+    },
+    extend: {},
+  },
+  plugins: [],
+};
+    </script>   
+    <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
+   
   </head>
   <body>
     <noscript>

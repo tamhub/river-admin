@@ -1,31 +1,20 @@
 <template>
-  <v-container fluid class="py-4">
-    <v-row v-if="items.length ==0">
+  <v-container class="pt-0 max-h-full overflow-y-auto">
+    <v-row v-if="items.length == 0">
       <v-col>No approval step</v-col>
     </v-row>
     <v-row v-else>
-      <v-col>
-        <Container
-          group-name="column"
-          @drop="on_drop($event)"
-          drag-handle-selector=".column-drag-handle"
-          drag-class="opacity-ghost"
-          drop-class="opacity-ghost-drop"
-        >
+      <div class="px-2 w-full">
+        <Container group-name="column" @drop="on_drop($event)" drag-handle-selector=".column-drag-handle"
+          drag-class="opacity-ghost" drop-class="opacity-ghost-drop">
           <Draggable v-for="(element) in items" :key="element.priority">
             <div class="draggable-item">
-              <ApprovalDetail
-                :workflow="workflow"
-                :editable="editable"
-                :approval="element"
-                @on-delete="delete_approval"
-                @on-hook-create="(hook)=>on_hook_created(hook)"
-                @on-hook-delete="(hook)=>on_hook_deleted(hook)"
-              />
+              <ApprovalDetail :workflow="workflow" :editable="editable" :approval="element" @on-delete="delete_approval"
+                @on-hook-create="(hook) => on_hook_created(hook)" @on-hook-delete="(hook) => on_hook_deleted(hook)" />
             </div>
           </Draggable>
         </Container>
-      </v-col>
+      </div>
     </v-row>
   </v-container>
 </template>
@@ -125,12 +114,15 @@ export default {
 .flip-list-move {
   transition: transform 0.5s;
 }
+
 .no-move {
   transition: transform 0s;
 }
+
 .list-group {
   width: 100%;
 }
+
 .column-drag-handle {
   cursor: move;
   padding: 5px;

@@ -103,7 +103,7 @@
                 <v-list dense>
                   <v-list-item :id="item.id" v-for="item in workflow_items" :key="item.title" @click="goTo(item)" link>
                     <v-list-item-icon>
-                      <v-icon :disabled="item.disabled">{{ item.icon }}</v-icon>
+                      <Icon name="db" :color="isCurrentPath(item) ? '#5E45FF' : ''" />
                     </v-list-item-icon>
 
                     <v-list-item-content>

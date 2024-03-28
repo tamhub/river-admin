@@ -5,7 +5,31 @@
       <v-container fluid>
         <v-row justify="center" align="center">
           <v-col id="svg-container" justify="center" align="center">
-            <svg width="650" height="270" class=" "></svg>
+            <svg id="svg" width="650" height="270" class="">
+              <defs>
+                <filter id="dropshadow" height="130%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="3" /> <!-- Blur amount -->
+                  <feOffset dx="2" dy="2" result="offsetblur" /> <!-- Shadow offset -->
+                  <feFlood flood-color="#5E45FF33" result="color" /> <!-- Change 'red' to your desired shadow color -->
+                  <feComposite in2="offsetblur" operator="in" result="shadow" />
+                  <feComponentTransfer>
+                    <feFuncA type="linear" slope="0.1" /> <!-- Shadow transparency -->
+                  </feComponentTransfer>
+                  <feMerge>
+                    <feMergeNode in="shadow" /> <!-- This contains the colored shadow -->
+                    <feMergeNode in="SourceGraphic" /> <!-- This contains the original element -->
+                  </feMerge>
+                </filter>
+                <marker id="start-marker" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
+                  orient="auto-start-reverse">
+                  <circle cx="5" cy="5" r="3" fill="transparent" />
+                </marker>
+                <marker id="end-marker" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
+                  orient="auto">
+                  <circle cx="5" cy="5" r="3" fill="transparent" />
+                </marker>
+              </defs>
+            </svg>
           </v-col>
         </v-row>
       </v-container>
@@ -59,7 +83,9 @@ export default {
             .select("#svg-container")
             .node()
             .getBoundingClientRect().width;
+
           d3.select("svg").attr("width", containerWidth - 24);
+          document.getElementById('svg').attributes.width.value = containerWidth - 24;
           this._reCenterSketch();
         }
       }
@@ -80,6 +106,8 @@ export default {
         });
 
         this._renderSketch();
+        this.onResize();
+        this._reCenterSketch();
         this.initialized = true;
       }
     },
@@ -96,8 +124,8 @@ export default {
     _createEdge(transition) {
       this.graph.setEdge(transition.source_state_id, transition.destination_state_id, {
         id: `transition_${transition.id}`,
-        label: "<<---",
-        curve: d3.curveBasis
+        label: "  ←",
+        curve: d3.curveBasis,
       });
     },
 
@@ -150,6 +178,16 @@ export default {
       var that = this;
       this.states.forEach(state => {
         d3.select(`g#state_${state.id} rect`).on("click", function () {
+          d3.selectAll(`g.node`).classed("selected", false);
+          d3.select(`g#state_${state.id}`).classed("selected", true);
+
+          // Remove "border" from all nodes
+          d3.selectAll(`g.node rect`).style("filter", "");;
+
+          // Add "border" to the clicked node
+          d3.select(this).style("filter", "url(#dropshadow)");;
+
+
           that.$emit("on-state-clicked", that._get_state_by_id(state.id));
         });
       });
@@ -185,8 +223,10 @@ export default {
       this.states.forEach(state => {
         if (that.state_class_mapping && that.state_class_mapping[state.id]) {
           if (that.state_class_mapping[state.id].rect) {
-            Object.keys(that.state_class_mapping[state.id].rect).forEach(style =>
+            Object.keys(that.state_class_mapping[state.id].rect).forEach(style => {
               d3.select(`g#state_${state.id} rect`).style(style, that.state_class_mapping[state.id].rect[style])
+              // d3.select(`g#state_${state.id}`).classed("selected", true);
+            }
             );
           }
           if (that.state_class_mapping[state.id].label) {
@@ -302,16 +342,23 @@ g.node-default>rect {
 g.node-default>g.label {
   /* stroke: black !important; */
   stroke-width: 0.3px !important;
+  pointer-events: none;
+}
+
+g.node-default.selected>rect {
+  stroke: #5E45FF !important;
+  box-shadow: 0 0 0 2px #5E45FF;
+
 }
 
 g.edge-SELECTED>rect {
-  stroke: deepskyblue !important;
+  stroke: #5E45FF !important;
   stroke-width: 2.5px !important;
 }
 
 g.edge-SELECTED>path.path {
-  stroke: deepskyblue !important;
-  stroke-width: 2.5;
+  stroke: #5E45FF !important;
+  stroke-width: 1.5;
 }
 
 g.edge-UNSELECTED>path.path {
@@ -320,8 +367,8 @@ g.edge-UNSELECTED>path.path {
 }
 
 g.edge-label-SELECTED tspan {
-  stroke: deepskyblue !important;
-  stroke-width: 2;
+  stroke: #5E45FF !important;
+  stroke-width: 1.5;
 }
 
 g.edge-UNSELECTED>path {
