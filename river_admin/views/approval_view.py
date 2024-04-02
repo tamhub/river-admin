@@ -86,6 +86,7 @@ def approve_transition(request):
     status_field_names = get_related_state_field_names(model_class)
     try:
         approve_transitions(request.user, workflow_object, status_field_names)
+        return Response("Transitions approved successfully.")
     except Exception as e:
         return Response(str(e), status=HTTP_400_BAD_REQUEST)
 
