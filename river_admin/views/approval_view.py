@@ -37,7 +37,10 @@ def get_linked_model_class(content_type_name):
         ContentType.DoesNotExist: If the content type does not exist in the database.
 
     """
-    return ContentType.objects.get(model=content_type_name).model_class()
+    if not isinstance(content_type_name, str):
+        raise ValueError('content_type_name must be a string')
+
+    return get_object_or_404(ContentType.objects.all(), model=content_type_name).model_class()
 
 
 def get_related_workflow_object(model_class, object_id):
@@ -133,5 +136,4 @@ def approve_single_transition(user, workflow_object, status_field_name):
     river_attr = getattr(workflow_object, "river", None)
     if river_attr and hasattr(river_attr, status_field_name):
         status_field_attr = getattr(river_attr, status_field_name)
-        if callable(status_field_attr):
-            status_field_attr.approve(as_user=user)
+        status_field_attr.approve(as_user=user)
