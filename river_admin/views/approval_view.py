@@ -158,7 +158,7 @@ def list_available_approvals(request):
     workflow_object = get_related_workflow_object(model_class, object_id)
     status_field_name = get_related_state_field_names(model_class)[0]
     try:
-        available_approvals = getattr(workflow_object.river, status_field_name).get_available_approvals(as_user=request.user)
+        available_approvals = getattr(workflow_object.river, status_field_name).get_available_states(as_user=request.user)
         data = {
             "available_approvals": available_approvals
         }
