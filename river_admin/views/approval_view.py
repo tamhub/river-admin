@@ -138,3 +138,27 @@ def approve_single_transition(user, workflow_object, status_field_name):
     if river_attr and hasattr(river_attr, status_field_name):
         status_field_attr = getattr(river_attr, status_field_name)
         status_field_attr.approve(as_user=user)
+
+
+@post(r'list-available-approvals/')
+def list_available_approvals(request):
+    """
+    List Available Approvals
+
+    Lists the available approvals for a user.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Response: The HTTP response containing the list of available approvals.
+    """
+    content_type_name, object_id, _ = retrieve_requested_data(request)
+    model_class = get_linked_model_class(content_type_name)
+    workflow_object = get_related_workflow_object(model_class, object_id)
+    status_field_name = get_related_state_field_names(model_class)[0]
+    try:
+        available_approvals = getattr(workflow_object.river, status_field_name).get_available_approvals(as_user=request.user)
+        return Response(available_approvals)
+    except Exception as e:
+        raise ValidationError(f"Error retrieving available approvals: {e}", code=HTTP_400_BAD_REQUEST)
