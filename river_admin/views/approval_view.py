@@ -159,6 +159,9 @@ def list_available_approvals(request):
     status_field_name = get_related_state_field_names(model_class)[0]
     try:
         available_approvals = getattr(workflow_object.river, status_field_name).get_available_approvals(as_user=request.user)
-        return Response(available_approvals)
+        data = {
+            "available_approvals": available_approvals
+        }
+        return Response(data)
     except Exception as e:
         raise ValidationError(f"Error retrieving available approvals: {e}", code=HTTP_400_BAD_REQUEST)
