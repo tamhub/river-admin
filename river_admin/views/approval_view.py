@@ -1,8 +1,10 @@
 from django.contrib.contenttypes.models import ContentType
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
+from river.models import State
 from river.models.fields.state import StateField
 
 from river_admin.views import post
@@ -158,10 +160,14 @@ def list_available_approvals(request):
     workflow_object = get_related_workflow_object(model_class, object_id)
     status_field_name = get_related_state_field_names(model_class)[0]
     try:
-        available_approvals = getattr(workflow_object.river, status_field_name).get_available_states(as_user=request.user)
-        data = {
-            "available_approvals": available_approvals
-        }
-        return Response(data)
+        available_approvals = getattr(workflow_object.river, status_field_name).get_available_states(
+            as_user=request.user)
+
+        class StateSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = State
+                fields = '__all__'
+
+        return Response(StateSerializer(available_approvals, many=True).data)
     except Exception as e:
         raise ValidationError(f"Error retrieving available approvals: {e}", code=HTTP_400_BAD_REQUEST)
