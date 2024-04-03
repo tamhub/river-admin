@@ -91,13 +91,13 @@ def approve_transition(request):
     workflow_object = get_related_workflow_object(model_class, object_id)
     status_field_names = get_related_state_field_names(model_class)
     try:
-        approve_transitions(request.user, workflow_object, status_field_names)
+        approve_transitions(request.user, workflow_object, status_field_names, destination_state)
         return Response("Transitions approved successfully.")
     except Exception as e:
         raise ValidationError(f"Error approving transitions: {e}", code=HTTP_400_BAD_REQUEST)
 
 
-def approve_transitions(user, workflow_object, status_field_names):
+def approve_transitions(user, workflow_object, status_field_names, destination_state=None):
     """
     Approves transitions for multiple status fields.
 
@@ -116,10 +116,10 @@ def approve_transitions(user, workflow_object, status_field_names):
     approve_transitions(user, workflow_object, status_fields)
     """
     for status_field_name in status_field_names:
-        approve_single_transition(user, workflow_object, status_field_name)
+        approve_single_transition(user, workflow_object, status_field_name, destination_state)
 
 
-def approve_single_transition(user, workflow_object, status_field_name):
+def approve_single_transition(user, workflow_object, status_field_name, destination_state=None):
     """
     Approves a single transition in the workflow for the specified user.
 
@@ -139,6 +139,8 @@ def approve_single_transition(user, workflow_object, status_field_name):
     river_attr = getattr(workflow_object, "river", None)
     if river_attr and hasattr(river_attr, status_field_name):
         status_field_attr = getattr(river_attr, status_field_name)
+        if destination_state:
+            status_field_attr.approve(as_user=user, next_state=destination_state)
         status_field_attr.approve(as_user=user)
 
 
