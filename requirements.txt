@@ -8,3 +8,4 @@ django-heroku
 psycopg2
 gunicorn
 faker
+djangorestframework-simplejwt
