@@ -142,7 +142,8 @@ def approve_single_transition(user, workflow_object, status_field_name, destinat
         if destination_state:
             destination_state = State.objects.get(label=destination_state)
             status_field_attr.approve(as_user=user, next_state=destination_state)
-        status_field_attr.approve(as_user=user)
+        else:
+            status_field_attr.approve(as_user=user)
 
 
 @post(r'list-available-approvals/')
