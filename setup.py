@@ -25,6 +25,7 @@ setup(
         "mock",
         "django",
         "djangorestframework",
+        "djangorestframework-simplejwt",
         "django-cors-headers",
         "django-river>=3.0.0",
     ],

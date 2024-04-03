@@ -1,11 +1,12 @@
 from django.db import IntegrityError
 from django.db.models import ProtectedError
 from rest_framework import serializers
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import api_view, authentication_classes, renderer_classes, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.views import exception_handler as drf_exception_handler
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from river_admin.views.error_code import CAN_NOT_DELETE_DUE_TO_PROTECTION, DUPLICATE_ITEM
 from django.urls import path as django_path
@@ -14,7 +15,7 @@ urls = []
 
 def _path(path, method, **options):
     def decorator(view):
-        authentications = options.get("authentication_classes", [TokenAuthentication])
+        authentications = options.get("authentication_classes", [TokenAuthentication, JWTAuthentication, SessionAuthentication])
         renderers = options.get("renderer_classes", [JSONRenderer])
         permissions = options.get("permission_classes", [IsAuthenticated])
         # Apply decorators
