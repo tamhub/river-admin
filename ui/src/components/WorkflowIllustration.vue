@@ -243,7 +243,6 @@ export default {
       var tip = d3
         .tip()
         .attr("class", "d3-tip")
-        .offset([-10, 0])
         .html(function (d) {
           var state = that.states.find(state => state.id == d);
           if (state) {
@@ -256,8 +255,19 @@ export default {
               description_html = `<div class="no-description-tooltip">No description found</div>`;
             }
           }
-          return `<div>${label_html}${description_html}</div>`;
+          return `<div>${description_html}</div>`;
         });
+
+
+      var originalShow = tip.show;
+      tip.show = function () {
+        var targetElement = d3.event.target;
+        var bbox = targetElement.getBoundingClientRect();
+        var offsetWidth = bbox.width;
+        tip.offset([-5, offsetWidth + 10]);
+        originalShow.apply(this, arguments);
+      };
+
 
       this.svg.call(tip);
 
@@ -361,6 +371,13 @@ g.edge-SELECTED>path.path {
   stroke-width: 1.5;
 }
 
+g.edge-SELECTED>defs * {
+  stroke: #5E45FF !important;
+
+  fill: #5E45FF !important;
+  stroke-width: 1.5;
+}
+
 g.edge-UNSELECTED>path.path {
   stroke: #000 !important;
   stroke-width: 1.5px;
@@ -415,9 +432,12 @@ text {
   line-height: 1;
   font-weight: bold;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.8);
+  background: white;
   color: #fff;
-  border-radius: 2px;
+  border-radius: 16px 16px 16px 0px !important;
+  box-shadow: 0px 8px 16px 0px #0000000A;
+  overflow: hidden;
+
 }
 
 .label-tooltip {
@@ -436,6 +456,6 @@ text {
   text-align: center;
   max-width: 400px;
   font-size: 14px;
-  color: red;
+  color: #A0A2A7;
 }
 </style>

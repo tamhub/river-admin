@@ -5,11 +5,8 @@
         <v-col justify="center" align="center" class="page-header">
           <div>
             <p class="text-[#121722] mb-6">
-              <span
-                class="text-[#A0A2A7 ] cursor-pointer"
-                @click="navigateToFunctions"
-                >Functions / </span
-              >[New Functoins]
+              <span class="text-[#A0A2A7 ] cursor-pointer" @click="navigateToFunctions">Functions / </span>[New
+              Function]
             </p>
           </div>
           <h1 class="flex items-center gap-2 cursor-pointer" @click="goBack">
@@ -23,34 +20,20 @@
           <v-row>
             <v-col class="functions">
               <p class="mb-0 !text-[#121722]">Function Name</p>
-              <v-text-field
-                v-model="callback_function_name"
-                :rules="functionNameRules"
-                required
-                variant="outlined"
-                placeholder="Callback Function Name"
-              ></v-text-field>
+              <v-text-field v-model="callback_function_name" :rules="functionNameRules" required variant="outlined"
+                placeholder="Callback Function Name"></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col>
-              <CodeEditor
-                v-model="callback_function_body"
-                class="border border-[#E7E8E9] rounded-[4px]"
-              />
+              <CodeEditor v-model="callback_function_body" class="border border-[#E7E8E9] rounded-[4px]" />
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <v-row>
         <v-col justify="center" align="right">
-          <v-btn
-            large
-            color="primary"
-            @click="publish"
-            dark
-            class="rounded-[64px] !py-5 !px-4 w-[150px]"
-          >
+          <v-btn large color="primary" @click="publish" dark class="rounded-[64px] !py-5 !px-4 w-[150px]">
             <v-icon>mdi-check</v-icon>
             <span class="normal-case font-bold text-base flex-1">Create </span>
           </v-btn>
@@ -115,6 +98,7 @@ export default {
   caret-color: #121722 !important;
   margin: 0 0 8px 0 !important;
 }
+
 .functions .v-input__slot:after {
   border: none !important;
 }
