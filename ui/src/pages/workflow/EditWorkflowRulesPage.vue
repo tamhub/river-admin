@@ -17,7 +17,7 @@
           </v-container>
         </v-flex>
         <v-flex class="py-3 pr-4" xs12 sm12 md4>
-          <div class="border border-[#E4E4E4] rounded-[20px] bg-[#FAFAFA] w-full" style="box-shadow: 0px 0px 64px 0px #D2D2D23D inset;
+          <div class="border border-[#E4E4E4] rounded-[20px] bg-[#FAFAFA] w-full overflow-x-hidden" style="box-shadow: 0px 0px 64px 0px #D2D2D23D inset;
 
 box-shadow: -2px 7px 16px 0px #BFBFBF1A;
 
@@ -26,7 +26,7 @@ box-shadow: -59px 170px 50px 0px #BFBFBF00;
 
 
             <div class="w-full h-full" v-if="selected_transition">
-              <div class="h-full flex flex-col pb-5">
+              <div class="h-full flex flex-col flex-nowrap pb-5 max-h-[calc(100vh-300px)] overflow-y-auto ">
                 <div class="w-full py-3 px-4">
                   <div class="w-full h-full">
                     <span class="text-[#A0A2A7] text-base">Transition</span>
@@ -72,20 +72,32 @@ box-shadow: -59px 170px 50px 0px #BFBFBF00;
                           Before completing the transition...
                         </span>
 
-                        <button @click="allowEditingHooks = !allowEditingHooks">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                        <button v-if="!readonly" @click="allowEditingHooks = !allowEditingHooks">
+                          <span v-if="!allowEditingHooks" class="w-8 h-8 flex items-center justify-center">
+
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <g clip-path="url(#clip0_24_1831)">
+                                <path
+                                  d="M11.334 2.00004C11.5091 1.82494 11.7169 1.68605 11.9457 1.59129C12.1745 1.49653 12.4197 1.44775 12.6673 1.44775C12.9149 1.44775 13.1601 1.49653 13.3889 1.59129C13.6177 1.68605 13.8256 1.82494 14.0007 2.00004C14.1757 2.17513 14.3146 2.383 14.4094 2.61178C14.5042 2.84055 14.5529 3.08575 14.5529 3.33337C14.5529 3.58099 14.5042 3.82619 14.4094 4.05497C14.3146 4.28374 14.1757 4.49161 14.0007 4.66671L5.00065 13.6667L1.33398 14.6667L2.33398 11L11.334 2.00004Z"
+                                  stroke="#121722" stroke-linecap="round" stroke-linejoin="round" />
+                              </g>
+                              <defs>
+                                <clipPath id="clip0_24_1831">
+                                  <rect width="16" height="16" fill="white" />
+                                </clipPath>
+                              </defs>
+                            </svg>
+                          </span>
+                          <svg v-else width="32" height="32" viewBox="0 0 32 32" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_24_1831)">
-                              <path
-                                d="M11.334 2.00004C11.5091 1.82494 11.7169 1.68605 11.9457 1.59129C12.1745 1.49653 12.4197 1.44775 12.6673 1.44775C12.9149 1.44775 13.1601 1.49653 13.3889 1.59129C13.6177 1.68605 13.8256 1.82494 14.0007 2.00004C14.1757 2.17513 14.3146 2.383 14.4094 2.61178C14.5042 2.84055 14.5529 3.08575 14.5529 3.33337C14.5529 3.58099 14.5042 3.82619 14.4094 4.05497C14.3146 4.28374 14.1757 4.49161 14.0007 4.66671L5.00065 13.6667L1.33398 14.6667L2.33398 11L11.334 2.00004Z"
-                                stroke="#121722" stroke-linecap="round" stroke-linejoin="round" />
-                            </g>
-                            <defs>
-                              <clipPath id="clip0_24_1831">
-                                <rect width="16" height="16" fill="white" />
-                              </clipPath>
-                            </defs>
+                            <path
+                              d="M0 16C0 7.16344 7.16344 0 16 0C24.8366 0 32 7.16344 32 16C32 24.8366 24.8366 32 16 32C7.16344 32 0 24.8366 0 16Z"
+                              fill="#5E45FF" />
+                            <path d="M21.3332 12L13.9998 19.3333L10.6665 16" stroke="white" stroke-linecap="round"
+                              stroke-linejoin="round" />
                           </svg>
+
 
                         </button>
 

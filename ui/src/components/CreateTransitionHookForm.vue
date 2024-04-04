@@ -5,18 +5,9 @@
       <v-container fluid>
         <v-row>
           <v-col>
-            <v-autocomplete
-              v-model="selected_function"
-              :items="functions"
-              :loading="functions_loading"
-              :search-input.sync="search_functions"
-              hide-selected
-              item-text="name"
-              label="Search functions"
-              clearable
-              chips
-              return-object
-            >
+            <v-autocomplete v-model="selected_function" :items="functions" :loading="functions_loading"
+              :search-input.sync="search_functions" hide-selected item-text="name" label="Search functions" clearable
+              chips return-object rounded solo prepend-inner-icon="fa-search">
               <template v-slot:no-data>
                 <v-list-item>
                   <v-list-item-title>
@@ -26,13 +17,7 @@
                 </v-list-item>
               </template>
               <template v-slot:selection="{ attr, on, item, selected }">
-                <v-chip
-                  v-bind="attr"
-                  :input-value="selected"
-                  color="primary"
-                  class="white--text"
-                  v-on="on"
-                >
+                <v-chip v-bind="attr" :input-value="selected" color="primary" class="white--text" v-on="on">
                   <v-icon left>mdi-function-variant</v-icon>
                   <span v-text="item.name"></span>
                 </v-chip>
@@ -70,7 +55,7 @@ export default {
     functions: [],
     search_functions: null
   }),
-  mounted() {},
+  mounted() { },
   watch: {
     selected_function(val) {
       this.search_functions = null;

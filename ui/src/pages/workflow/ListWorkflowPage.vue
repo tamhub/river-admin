@@ -168,7 +168,7 @@
                   </span>
                 </div>
                 <v-row class="mb-10 container px-5" align="center" justify="start">
-                  <H5Max class="font-semibold" v-model="item.content_type.app_label" max="16" />
+                  <H5Max class="font-semibold" v-model="item.content_type.model" max="16" />
                 </v-row>
                 <!-- <v-row align="center" justify="center">
                         <H5Max v-model="item.field_name" max="16" />
@@ -206,21 +206,57 @@
 
       <v-dialog v-if="this.deletingWorkflow" v-model="deleteDialog" max-width="50%">
         <v-card>
-          <v-card-title class="headline">
-            Delete workflow &nbsp;
-            <v-chip color="primary">{{ deletingWorkflow.identifier }}</v-chip>&nbsp; ?
+          <v-card-title class="headline flex flex-col gap-[17px]">
+            <svg width="133" height="132" viewBox="0 0 133 132" fill="none" class="m-auto"
+              xmlns="http://www.w3.org/2000/svg">
+              <path opacity="0.1"
+                d="M11.5 60C11.5 90 44.8056 126 66 126C87.1944 126 120.5 90 120.5 60V42C120.5 33 114.444 24 102.333 18C102.333 18 81.1389 6 66 6C50.8611 6 29.6667 18 29.6667 18C17.5556 24 11.5 33 11.5 42V60Z"
+                fill="#E33554" />
+              <path opacity="0.2"
+                d="M13.5 60.2C13.5 89.2 45.5833 124 66 124C86.4167 124 118.5 89.2 118.5 60.2V42.8C118.5 34.1 112.667 25.4 101 19.6C101 19.6 80.5833 8 66 8C51.4167 8 31 19.6 31 19.6C19.3333 25.4 13.5 34.1 13.5 42.8V60.2Z"
+                fill="#E33554" />
+              <path opacity="0.3"
+                d="M16.5 60.5C16.5 88 46.75 121 66 121C85.25 121 115.5 88 115.5 60.5V44C115.5 35.75 110 27.5 99 22C99 22 79.75 11 66 11C52.25 11 33 22 33 22C22 27.5 16.5 35.75 16.5 44V60.5Z"
+                fill="#E33554" />
+              <path d="M66.4805 47.8335V67.8335" stroke="#E33554" stroke-width="4.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M66.4805 87.8335H66.5273" stroke="#E33554" stroke-width="4.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            <span class="font-bold text-[40px] text-[#E33554]">
+              {{ "Delete workflow" }}
+            </span>
+            <div>
+
+              <p class="text-center text-xl text-[#121722] break-normal mb-0">
+                {{ `Are you sure you want to remove ${deletingWorkflow.identifier || ''} this workflow?` }}
+              </p>
+              <p class="text-center text-base text-[#121722b0] break-normal mb-0">
+                Deleting the workflow will delete all transitions and approval meta data belongs to
+                it.
+              </p>
+            </div>
+            <v-card-actions class="flex gap-[17px] items-center justify-start">
+              <div
+                class="flex items-center gap-2 bg-transparent text-[#5E45FF] border-[#5E45FF] border  p-4 rounded-[64px] w-[200px] ms-auto cursor-pointer"
+                @click="deleteDialog = false">
+                <span class=" font-bold text-base flex-1 text-center">No, keep</span>
+              </div>
+
+              <div class="flex items-center gap-2 bg-[#FFDFDF] p-4 rounded-[64px] w-[200px] ms-auto cursor-pointer"
+                @click="deleteWorkflow()">
+                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 4.5H3.33333H14" stroke="#E33554" stroke-linecap="round" stroke-linejoin="round" />
+                  <path
+                    d="M5.33325 4.50016V3.16683C5.33325 2.81321 5.47373 2.47407 5.72378 2.22402C5.97383 1.97397 6.31296 1.8335 6.66659 1.8335H9.33325C9.68687 1.8335 10.026 1.97397 10.2761 2.22402C10.5261 2.47407 10.6666 2.81321 10.6666 3.16683V4.50016M12.6666 4.50016V13.8335C12.6666 14.1871 12.5261 14.5263 12.2761 14.7763C12.026 15.0264 11.6869 15.1668 11.3333 15.1668H4.66659C4.31296 15.1668 3.97382 15.0264 3.72378 14.7763C3.47373 14.5263 3.33325 14.1871 3.33325 13.8335V4.50016H12.6666Z"
+                    stroke="#E33554" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+
+                <span class="text-[#FF0F0F] font-bold text-base flex-1 text-center">Yes, delete</span>
+              </div>
+            </v-card-actions>
           </v-card-title>
 
-          <v-card-text>Deleting the workflow will delete all transitions and approval meta data belongs to
-            it.</v-card-text>
-
-          <v-card-actions>
-            <div class="flex-grow-1"></div>
-
-            <v-btn large color="primary" @click="deleteDialog = false">Close</v-btn>
-
-            <v-btn large color="warning" @click="deleteWorkflow()">Agree</v-btn>
-          </v-card-actions>
         </v-card>
       </v-dialog>
     </v-container>
@@ -327,10 +363,10 @@ export default {
     },
     deleteWorkflow() {
       if (this.deletingWorkflow) {
-        http.delete(`/workflow/delete/${this.deletingWorkflow.id}/`, () => {
+        http.delete(`/workflow/delete/${this.deletingWorkflow}/`, () => {
           this.fetchWorkflows();
           this.deleteDialog = false;
-          emit_success(`Workflow ${this.deletingWorkflow.identifier} is deleted.`);
+          emit_success(`Workflow ${this.deletingWorkflow} is deleted.`);
         });
       }
     }

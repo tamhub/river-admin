@@ -22,7 +22,7 @@
       <div class="flex items-start justify-start gap-3 pt-2">
         <div class="max-w-[500px] w-full">
           <StateInput :disabled="!selected_state" v-model="new_transition_state"
-            :placeholder="selected_state ? `New state from '${selected_state.label}':` : 'Select a state to creat a transition'" />
+            :placeholder="selected_state ? `New state from '${selected_state.label}':` : 'Select a state to create a transition'" />
         </div>
         <div>
           <v-btn class="rounded-full mt-0.5" :disabled="!selected_state || !new_transition_state" large color="primary"

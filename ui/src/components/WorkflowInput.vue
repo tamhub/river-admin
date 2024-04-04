@@ -1,15 +1,7 @@
 <template>
-  <v-autocomplete
-    v-model="model"
-    :items="items"
-    :loading="loading"
-    :search-input.sync="search"
-    hide-selected
-    item-text="identifier"
-    label="Search for a workflow..."
-    clearable
-    return-object
-  >
+  <v-autocomplete v-model="model" :items="items" :loading="loading" :search-input.sync="search" hide-selected
+    item-text="identifier" label="Search for a workflow..." clearable return-object rounded solo
+    prepend-inner-icon="fa-search">
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-title>
@@ -58,3 +50,20 @@ export default {
   }
 };
 </script>
+
+<style>
+.v-input__icon--prepend-inner {
+  width: 20px;
+  height: 20px;
+  padding-right: 5px;
+}
+
+.v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot {
+  box-shadow: none !important;
+  border: 1.5px solid #D2D2D2;
+}
+
+.v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)>.v-input__control>.v-input__slot:focus-within {
+  border: 1.5px solid #5E45FF
+}
+</style>
