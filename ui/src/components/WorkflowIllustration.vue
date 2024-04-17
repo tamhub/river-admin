@@ -1,10 +1,11 @@
 <template>
-  <div v-resize="onResize" class="w-full bg-[#E9E9E9] rounded-[20px] relative" style="height: calc(100vh - 300px);">
-    <span class="absolute top-0 left-0 px-6 py-4 text-[#A0A2A7]">Diagram</span>
+  <div v-resize="onResize" class="w-full bg-[#E9E9E9] rounded-[20px] relative overflow-hidden cursor-move select-none"
+    style="height: calc(100vh - 300px);" @mousedown="startDrag" @mouseup="stopDrag" @wheel="handleScroll">
+    <span class="absolute top-0 left-0 px-6 py-4 rounded-md m-1 text-[#A0A2A7] bg-[#E9E9E9] z-10">Diagram</span>
     <v-card-text>
       <v-container fluid>
         <v-row justify="center" align="center">
-          <v-col id="svg-container" justify="center" align="center">
+          <v-col ref="draggableContainer" class="relative" id="svg-container" justify="center" align="center">
             <svg id="svg" width="650" height="270" class="">
               <defs>
                 <filter id="dropshadow" height="130%">
@@ -30,6 +31,8 @@
                 </marker>
               </defs>
             </svg>
+
+
           </v-col>
         </v-row>
       </v-container>
@@ -55,7 +58,11 @@ export default {
     windowSize: {
       x: 0,
       y: 0
-    }
+    },
+    dragging: false,
+    resizing: false,
+    initialX: 0,
+    initialY: 0
   }),
   mounted() {
     this._initialize();
@@ -75,6 +82,61 @@ export default {
     }
   },
   methods: {
+    startDrag(event) {
+      this.dragging = true;
+      this.initialX = event.clientX;
+      this.initialY = event.clientY;
+
+      const rect = this.$refs.draggableContainer.getBoundingClientRect();
+      // Initialize left and top if they are not set
+      if (!this.$refs.draggableContainer.style.left) {
+        this.$refs.draggableContainer.style.left = rect.left + 'px';
+      }
+      if (!this.$refs.draggableContainer.style.top) {
+        this.$refs.draggableContainer.style.top = rect.top + 'px';
+      }
+
+      document.addEventListener('mousemove', this.drag);
+      document.addEventListener('mouseup', this.stopDrag);
+    },
+    drag(event) {
+      if (!this.dragging) return;
+      const deltaX = event.clientX - this.initialX;
+      const deltaY = event.clientY - this.initialY;
+
+      // Update left and top based on the delta
+      let newLeft = parseInt(this.$refs.draggableContainer.style.left) + deltaX;
+      let newTop = parseInt(this.$refs.draggableContainer.style.top) + deltaY;
+
+      this.$refs.draggableContainer.style.left = newLeft + 'px';
+      this.$refs.draggableContainer.style.top = newTop + 'px';
+
+      // Update initial positions for the next move
+      this.initialX = event.clientX;
+      this.initialY = event.clientY;
+    },
+    stopDrag() {
+      this.dragging = false;
+      document.removeEventListener('mousemove', this.drag);
+      document.removeEventListener('mouseup', this.stopDrag);
+    },
+    handleScroll(event) {
+      if (event.ctrlKey) {
+        event.preventDefault(); // Prevent the default scroll behavior
+        const scaleAmount = 0.1;
+        const container = this.$refs.draggableContainer;
+        let scale = Number(container.getAttribute('data-scale')) || 1;
+        if (event.deltaY < 0) {
+          scale += scaleAmount; // Zoom in
+        } else {
+          scale -= scaleAmount; // Zoom out
+        }
+        // Ensure scale does not go below a minimum value, e.g., 0.1
+        scale = Math.max(scale, 0.1);
+        container.style.transform = `scale(${scale})`;
+        container.setAttribute('data-scale', scale); // Store the current scale
+      }
+    },
     onResize() {
       if (this.svg) {
         if (Math.abs(this.windowSize.x - window.innerWidth) > 50) {
@@ -400,6 +462,7 @@ g.edge-label-UNSELECTED {
   stroke-width: 15px !important;
   stroke-miterlimit: 0 !important;
   opacity: 0 !important;
+  cursor: pointer;
 }
 
 text {
