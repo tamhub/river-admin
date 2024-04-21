@@ -101,7 +101,14 @@ export default {
     groups: [],
     permissions: [],
     search_permissions: null,
-    search_groups: null
+    search_groups: null,
+    replaceList: {
+      "fms_user": "FMS User",
+      "fms_admin": "FMS Admin",
+      "fms_bank": "Financial Operator",
+      "fms_operator": "Financial Operator",
+      "fms_expert": "Client"
+    }
   }),
   mounted() { },
   watch: {
@@ -130,7 +137,18 @@ export default {
         return;
       }
       this.groups_loading = true;
-      http.get("/group/list/", response => (this.groups = response.data)).finally(() => (this.groups_loading = false));
+      http.get("/group/list/", response => {
+        this.groups = response.data;
+
+        this.groups = this.groups.map(group => ({
+          name: this.replaceList[group.name] || group.name,
+          id: group.id
+        }));
+
+        console.log(this.groups);
+
+      
+      }).finally(() => (this.groups_loading = false));
     }
   },
   methods: {

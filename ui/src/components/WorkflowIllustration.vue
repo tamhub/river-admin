@@ -1,5 +1,5 @@
 <template>
-  <div v-resize="onResize" class="w-full bg-[#E9E9E9] rounded-[20px] relative overflow-hidden cursor-move select-none"
+  <div v-resize="onResize" class="w-full bg-[#E9E9E9] rounded-[20px] relative overflow-hidden cursor-move select-none z-0"
     style="height: calc(100vh - 300px);" @mousedown="startDrag" @mouseup="stopDrag" @wheel="handleScroll">
     <span class="absolute top-0 left-0 px-6 py-4 rounded-md m-1 text-[#A0A2A7] bg-[#E9E9E9] z-10">Diagram</span>
     <v-card-text>
@@ -173,7 +173,6 @@ export default {
         this.initialized = true;
       }
     },
-
     _createNode(state, index) {
       this.graph.setNode(state.id, {
         label: state.label,
@@ -182,7 +181,6 @@ export default {
 
       });
     },
-
     _createEdge(transition) {
       this.graph.setEdge(transition.source_state_id, transition.destination_state_id, {
         id: `transition_${transition.id}`,
@@ -190,7 +188,6 @@ export default {
         curve: d3.curveBasis,
       });
     },
-
     _destroySketchComponents() {
       var g = this.graph;
       this.graph.nodes().forEach(function (v) {
@@ -286,20 +283,22 @@ export default {
         if (that.state_class_mapping && that.state_class_mapping[state.id]) {
           if (that.state_class_mapping[state.id].rect) {
             Object.keys(that.state_class_mapping[state.id].rect).forEach(style => {
-              d3.select(`g#state_${state.id} rect`).style(style, that.state_class_mapping[state.id].rect[style])
-              // d3.select(`g#state_${state.id}`).classed("selected", true);
+              d3.select(`g#state_${state.id} rect`).style(style, that.state_class_mapping[state.id].rect[style]);
+              d3.select(`g#state_${state.id}`).classed(that.state_class_mapping[state.id].class, true);
             }
             );
           }
           if (that.state_class_mapping[state.id].label) {
             Object.keys(that.state_class_mapping[state.id].label).forEach(style =>
-              d3.select(`g#state_${state.id} g.label`).style(style, that.state_class_mapping[state.id].label[style])
+              {
+                d3.select(`g#state_${state.id} g.label`).style(style, `${that.state_class_mapping[state.id].label[style]}`).classed(that.state_class_mapping[state.id].class, true);
+
+              }
             );
           }
         }
       });
     },
-
     _setup_tooltips(inner) {
       var that = this;
       var tip = d3
@@ -381,11 +380,9 @@ export default {
         node.rx = node.ry = 5;
       });
     },
-
     _get_state_by_id(state_id) {
       return this.states.find(state => state.id == state_id);
     },
-
     _get_transition_by_id(transition_id) {
       return this.transitions.find(transition => transition.id == transition_id);
     }
@@ -421,6 +418,42 @@ g.node-default.selected>rect {
   stroke: #5E45FF !important;
   box-shadow: 0 0 0 2px #5E45FF;
 
+}
+
+g.node-default>g.label.current {
+  stroke: #5E45FF !important;
+  fill: #5E45FF !important;
+  stroke-width: 0.3px !important;
+  pointer-events: none;
+}
+
+g.node-default.current>rect {
+  stroke: #5E45FF !important;
+  box-shadow: 0 0 0 2px #5E45FF;
+}
+
+g.node-default>g.label.done {
+  stroke: #4caf50 !important;
+  fill: #4caf50 !important;
+  stroke-width: 0.3px !important;
+  pointer-events: none;
+}
+
+g.node-default.done>rect {
+  stroke: #4caf50 !important;
+  box-shadow: 0 0 0 2px #4caf50;
+}
+
+g.node-default>g.label.cancelled {
+  stroke: #4caf50 !important;
+  fill: #4caf50 !important;
+  stroke-width: 0.3px !important;
+  pointer-events: none;
+}
+
+g.node-default.cancelled>rect {
+  stroke: #4caf50 !important;
+  box-shadow: 0 0 0 2px #4caf50;
 }
 
 g.edge-SELECTED>rect {

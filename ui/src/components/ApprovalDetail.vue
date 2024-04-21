@@ -137,7 +137,7 @@
                 <span v-bind:key="group.id" v-for="(group, index) in approval.groups">
                   <span
                     class="bg-[#E5E9F7] text-base mb-2 text-[#0028B3]  px-2.5 py-1 rounded-full truncate select-none inline-flex items-center gap-2">
-                    <span v-text="group.name"></span>
+                    <span v-text="replaceList[group.name] || group.name"></span>
                   </span>
                   <span v-if="index != approval.groups.length - 1">, </span>
                 </span>
@@ -206,7 +206,14 @@ export default {
   data: () => ({
     fab: false,
     newHookDialog: false,
-    allowEditing: false
+    allowEditing: false,
+    replaceList: {
+      "fms_user": "FMS User",
+      "fms_admin": "FMS Admin",
+      "fms_bank": "Financial Operator",
+      "fms_operator": "Financial Operator",
+      "fms_expert": "Client"
+    }
   }),
   methods: {
     delete_approval() {

@@ -103,11 +103,11 @@
                 <v-list dense>
                   <v-list-item :id="item.id" v-for="item in workflow_items" :key="item.title" @click="goTo(item)" link>
                     <v-list-item-icon>
-                      <Icon name="db" :color="isCurrentPath(item) ? '#5E45FF' : ''" />
+                      <Icon name="list" :color="isCurrentItem(item) ? '#5E45FF' : ''" />
                     </v-list-item-icon>
 
                     <v-list-item-content>
-                      <v-list-item-title>{{ item.title }}</v-list-item-title>
+                      <v-list-item-title>{{ getItemTitle(item) }}</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list>
@@ -156,7 +156,12 @@ export default {
       { id: "workflow-list", title: "Workflows", icon: "git", name: "list-workflows", authorization_object_type: WORKFLOW },
       { id: "state-list", title: "States", icon: "tag", name: "list-states", authorization_object_type: STATE },
       { id: "function-list", title: "Functions", icon: "zap", name: "list-callback-functions", authorization_object_type: FUNCTION }
-    ]
+    ],
+    replaceList: {
+      "BudgetExpense (river_status)": "Tarjim Submissions",
+      "BudgetStage (river_status)": "Stages Submissions",
+      "Issue Tracking Flow": "Issues"
+    }
   }),
   mounted() {
     if (!this.initialized) {
@@ -206,6 +211,12 @@ export default {
     },
     isCurrentPath(item) {
       return this.$route.name == item.name
+    },
+    isCurrentItem(item) {
+      return this.$route.name == item.name && this.$route.params.workflow_id == item.id
+    },
+    getItemTitle(item) {
+      return this.replaceList[item.title] || item.title
     }
   },
   components: {

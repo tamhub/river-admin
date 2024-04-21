@@ -10,6 +10,7 @@ import git from '@/assets/icons/git.svg';
 import tag from '@/assets/icons/tag.svg';
 import zap from '@/assets/icons/zap.svg';
 import db from '@/assets/icons/db.svg';
+import list from '@/assets/icons/list.svg';
 
 export default {
     name: 'Icon',
@@ -37,7 +38,8 @@ export default {
                 git,
                 tag,
                 zap,
-                db
+                db,
+                list
             };
             return icons[this.name] || null;
         }

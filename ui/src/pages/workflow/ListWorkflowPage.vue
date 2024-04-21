@@ -168,7 +168,7 @@
                   </span>
                 </div>
                 <v-row class="mb-10 container px-5" align="center" justify="start">
-                  <H5Max class="font-semibold" v-model="item.content_type.model" max="16" />
+                  <H5Max class="font-semibold" :value="getItemTitle(item)" max="16" />
                 </v-row>
                 <!-- <v-row align="center" justify="center">
                         <H5Max v-model="item.field_name" max="16" />
@@ -299,7 +299,12 @@ export default {
     has_add_workflow_permission: false,
     has_delete_workflow_permission: false,
     has_change_workflow_permission: false,
-    items: []
+    items: [],
+    replaceList: {
+      "stage": "Tarjim Submissions",
+      "budgetexpense": "Tarjim",
+      "budgetstage": "Stages"
+    }
   }),
   methods: {
     setAlertMessage(message) {
@@ -369,6 +374,9 @@ export default {
           emit_success(`Workflow ${this.deletingWorkflow} is deleted.`);
         });
       }
+    },
+    getItemTitle(item) {
+      return this.replaceList[item.content_type.model] || item.content_type.model
     }
   }
 };

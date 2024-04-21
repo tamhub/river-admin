@@ -1,10 +1,10 @@
 <template>
   <div v-if="initialized">
     <v-container v-if="states && transitions" fluid>
-      <v-row justify="center" align="center" class="mb-6">
-        <h1>
-          Active Workflow for
-          <v-chip>{{ object_identifier }}</v-chip>
+      <v-row justify="start" align="center" class="mb-6">
+        <h1 class="text-2xl font-bold pl-4">
+          Active Workflow: {{object_identifier}}
+          <!-- <v-chip>{{ object_identifier }}</v-chip> -->
         </h1>
       </v-row>
       <v-row>
@@ -30,8 +30,7 @@
                           <span v-text="get_state_by(selected_transition.destination_state_id).label"></span>
                         </v-chip>
                       </v-col>
-                      <div class="flex-grow-1" />
-                      <v-col v-if="!selected_transition.is_done && !readonly">
+                      <!-- <v-col v-if="!selected_transition.is_done && !readonly">
                         <v-speed-dial v-model="fab" :bottom="true" :right="true" direction="left" :open-on-hover="true">
                           <template v-slot:activator>
                             <v-btn v-model="fab" color="primary" dark fab>
@@ -39,7 +38,6 @@
                               <v-icon v-else>mdi-plus</v-icon>
                             </v-btn>
                           </template>
-
                           <v-tooltip top>
                             <template v-slot:activator="{ on }">
                               <v-btn fab dark small v-on="on" color="green" @click="newTransitionHookDialog = true">
@@ -49,7 +47,7 @@
                             <span>Create Transition Hook</span>
                           </v-tooltip>
                         </v-speed-dial>
-                      </v-col>
+                      </v-col> -->
                     </v-row>
                   </v-card-title>
                   <v-card-text>
@@ -166,7 +164,8 @@ export default {
       },
       label: {
         stroke: "white"
-      }
+      },
+      class: "done"
     },
     cancelled_state_class: {
       rect: {
@@ -174,7 +173,8 @@ export default {
       },
       label: {
         stroke: "white"
-      }
+      },
+      class: "cancelled"
     },
     current_state_class: {
       rect: {
@@ -182,7 +182,8 @@ export default {
       },
       label: {
         stroke: "white"
-      }
+      },
+      class: "current"
     }
   }),
   mounted() {

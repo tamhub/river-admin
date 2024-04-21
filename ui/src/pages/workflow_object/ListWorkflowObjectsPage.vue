@@ -4,7 +4,7 @@
       <v-row justify="center" align="center">
         <v-col justify="start" align="start">
           <h1 class="font-bold text-[#121722] text-[24px]">
-            Workflow objects
+            {{ getItemTitle(workflow) }}
             <!-- <v-chip color="primary" class="white--text">
               <v-icon left>mdi-sitemap</v-icon>
               <span v-text="workflow.identifier"></span>
@@ -120,7 +120,18 @@ export default {
     deleteDialog: false,
     workflow_objects: [],
     has_delete_workflow_permission: false,
-    has_change_workflow_permission: false
+    has_change_workflow_permission: false,
+    replaceList: {
+      "stage": "Tarjim Submissions",
+      "budgetexpense": "Tarjim",
+      "budgetstage": "Stages",
+      "pk": "ID",
+      "river_status": "Status",
+      "content_type": "Content Type",
+      "initial_state": "Initial State",
+      "field_name": "Field Name",
+      "my_state_field": "Status"
+    },
   }),
   watch: {
     $route(to, from) {
@@ -162,7 +173,7 @@ export default {
       return http
         .get(`/workflow/object/list/${this.workflow.id}/`, response => {
           this.headers = response.data.headers
-            .map(key => ({ text: key, value: key, align: "left" }))
+            .map(key => ({ text: this.replaceList[key] || key, value: key, align: "left" }))
             .concat([{ text: "Actions", value: "action", sortable: false }]);
           this.workflow_objects = response.data.workflow_objects.map(workflow_object => ({ ...workflow_object, identifier: workflow_object.__str }));
         })
@@ -200,6 +211,9 @@ export default {
       if (Object.keys(query).some(queryKey => that.$route.query[queryKey] != query[queryKey])) {
         this.$router.push({ query });
       }
+    },
+    getItemTitle(item) {
+      return this.replaceList[item.content_type.model] || item.content_type.model
     }
   }
 };
