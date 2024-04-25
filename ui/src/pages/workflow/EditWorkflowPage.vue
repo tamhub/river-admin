@@ -16,7 +16,8 @@
       <v-row>
         <v-col cols="12">
           <WorkflowIllustration :states="states" :transitions="transitions" :state_class_mapping="state_class_mapping"
-            :editable="true" @on-transition-selected="onTransitionSelected" @on-state-clicked="onStateSelected" />
+            :editable="true" @on-transition-selected="onTransitionSelected" @on-state-clicked="onStateSelected"
+            @refetch="refetch" />
         </v-col>
       </v-row>
       <div class="flex items-start justify-start gap-3 pt-2">
@@ -87,29 +88,32 @@ export default {
     }
   }),
   mounted() {
-    var workflow_id = this.$route.params.id;
-    this.workflow = http.get(`/workflow/get/${workflow_id}/`, result => {
-      this.workflow = Workflow.of(result.data.id, result.data.content_type, result.data.initial_state, result.data.field_name);
-
-      var state_fetcher = http.get(`/workflow/state/list/${workflow_id}/`, result => {
-        this.states = result.data.map(state => State.of(state.id, state.label).of_description(state.description));
-      });
-
-      var transition_meta_fetcher = http.get(`/workflow/transition-meta/list/${workflow_id}/`, result => {
-        this.transitions = result.data.map(transition => Transition.of(transition.id, this.workflow, transition.source_state, transition.destination_state));
-      });
-
-      Promise.all([state_fetcher, transition_meta_fetcher]).then(() => {
-        this.initialized = true;
-
-        var selected_state = JSON.parse(this.$route.query.selected_state || null);
-        if (selected_state) {
-          this._selected_state(selected_state);
-        }
-      });
-    });
+    this.refetch();
   },
   methods: {
+    refetch() {
+      var workflow_id = this.$route.params.id;
+      this.workflow = http.get(`/workflow/get/${workflow_id}/`, result => {
+        this.workflow = Workflow.of(result.data.id, result.data.content_type, result.data.initial_state, result.data.field_name);
+
+        var state_fetcher = http.get(`/workflow/state/list/${workflow_id}/`, result => {
+          this.states = result.data.map(state => State.of(state.id, state.label).of_description(state.description));
+        });
+
+        var transition_meta_fetcher = http.get(`/workflow/transition-meta/list/${workflow_id}/`, result => {
+          this.transitions = result.data.map(transition => Transition.of(transition.id, this.workflow, transition.source_state, transition.destination_state));
+        });
+
+        Promise.all([state_fetcher, transition_meta_fetcher]).then(() => {
+          this.initialized = true;
+
+          var selected_state = JSON.parse(this.$route.query.selected_state || null);
+          if (selected_state) {
+            this._selected_state(selected_state);
+          }
+        });
+      });
+    },
     onStateSelected(state) {
       this._selected_state(state);
     },
