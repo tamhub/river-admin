@@ -290,18 +290,15 @@ export default {
         render(inner, this.graph);
         inner.selectAll("g.node rect").attr("rx", "20").attr("ry", "20");
 
-        inner.selectAll("g.node").each(function (nodeId) {
-          console.log(that.editable);
-          if (that.editable) {
-
-
+        inner.selectAll("g.node").each(function (nodeId, index) {
+          if (that.editable && index !== 0) {
             let nodeElement = d3.select(this);
             let nodeWidth = nodeElement.node().getBBox().width;
             let nodeHeight = nodeElement.node().getBBox().height;
 
             let deleteButton = nodeElement.append("g")
               .attr("class", "delete-button")
-              .attr("transform", `translate(${(nodeWidth / 2) - 10}, -20)`) // Adjust the position relative to the node
+              .attr("transform", `translate(${(nodeWidth / 2) - 10}, -20)`)
               .on("click", () => {
                 that._deleteState(nodeId);
               });
@@ -494,7 +491,8 @@ export default {
 
     },
     deleteState() {
-      http.delete(`/state/delete/${this.stateToBeDeletedId}/`, () => {
+      var workflow_id = this.$route.params.id;
+      http.delete(`/state/delete/${workflow_id}/${this.stateToBeDeletedId}/`, () => {
         // this.fetchStates();
         this.$emit("refetch");
         this.deleteDialog = false;
