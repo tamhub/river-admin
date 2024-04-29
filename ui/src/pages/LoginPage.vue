@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <v-content>
     <v-container class="fill-height" fluid>
       <v-row align="center" justify="center">
@@ -76,6 +76,34 @@ export default {
           emit_error(["Authentication failed with given credentials!"], 10000);
         });
     }
+  }
+};
+</script> -->
+
+
+<template>
+  <SplashScreen />
+</template>
+
+<script>
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import SplashScreen from '@/components/SplashScreen';
+
+export default {
+  setup(props) {
+    const router = useRouter();
+
+    onMounted(() => {
+      const BASE_URL = "https://core.verse-stg.tam.run";
+      const finalAppName = "/#/";
+      const from = router.currentRoute.value.query.from || "/";
+      window.location.replace(
+        `${BASE_URL}/api/auth/login?src=fe&next=${window.location.origin}${finalAppName}/loading?from=${from}`
+      );
+    });
+
+    return {};
   }
 };
 </script>
