@@ -3,7 +3,7 @@
     <v-container v-if="states && transitions" fluid>
       <v-row justify="start" align="center" class="mb-6">
         <h1 class="text-2xl font-bold pl-4">
-          Active Workflow: {{object_identifier}}
+          Active Workflow: {{ object_identifier }}
           <!-- <v-chip>{{ object_identifier }}</v-chip> -->
         </h1>
       </v-row>
@@ -11,7 +11,8 @@
         <v-flex xs12 sm12 md6>
           <v-container>
             <WorkflowIllustration :states="states" :transitions="transitions" :editable="false"
-              :state_class_mapping="state_class_mapping" @on-transition-selected="on_transition_selected" />
+              :state_class_mapping="state_class_mapping" @on-transition-selected="on_transition_selected"
+              @refetch="refetch" />
           </v-container>
         </v-flex>
         <v-flex xs12 sm12 md6>
@@ -38,16 +39,16 @@
                               <v-icon v-else>mdi-plus</v-icon>
                             </v-btn>
                           </template>
-                          <v-tooltip top>
-                            <template v-slot:activator="{ on }">
+<v-tooltip top>
+  <template v-slot:activator="{ on }">
                               <v-btn fab dark small v-on="on" color="green" @click="newTransitionHookDialog = true">
                                 <v-icon>mdi-function-variant</v-icon>
                               </v-btn>
                             </template>
-                            <span>Create Transition Hook</span>
-                          </v-tooltip>
-                        </v-speed-dial>
-                      </v-col> -->
+  <span>Create Transition Hook</span>
+</v-tooltip>
+</v-speed-dial>
+</v-col> -->
                     </v-row>
                   </v-card-title>
                   <v-card-text>
@@ -187,53 +188,58 @@ export default {
     }
   }),
   mounted() {
-    var workflow_id = this.$route.params.workflow_id;
-    var workflow_object_id = this.$route.params.object_id;
-    http.get(`/workflow/get/${workflow_id}/`, response => {
-      this.workflow = Workflow.of(response.data.id, response.data.content_type, response.data.initial_state, response.data.field_name);
 
-      var object_identifier_fetcher = http.get(`/workflow-object/identify/${this.workflow.id}/${workflow_object_id}/`, response => {
-        this.object_identifier = response.data;
-      });
+    this.refetch()
 
-      var current_state_fetcher = http.get(`/workflow-object/current-state/${this.workflow.id}/${workflow_object_id}/`, response => {
-        this.current_state = State.of(response.data.id, response.data.label).of_description(response.data.description);
-      });
-
-      var current_iteration_fetcher = http.get(`/workflow-object/current-iteration/${this.workflow.id}/${workflow_object_id}/`, response => {
-        this.current_iteration = response.data;
-      });
-
-      var state_fetcher = this.get_states(workflow_id, workflow_object_id).then(states => (this.states = states));
-      var transitions_fetcher = this.get_transitions(workflow_id, workflow_object_id)
-        .then(transitions => (this.transitions = transitions))
-        .then(() => {
-          var that = this;
-          this.transitions.forEach(transition => {
-            if (transition.is_done) {
-              that.state_class_mapping[transition.source_state_id] = that.done_state_class;
-              that.state_class_mapping[transition.destination_state_id] = that.done_state_class;
-            } else if (transition.is_cancelled) {
-              that.state_class_mapping[transition.destination_state_id] = that.cancelled_state_class;
-            } else {
-              that.state_class_mapping[transition.destination_state_id] = that.pending_state_class;
-            }
-          });
-        });
-
-      Promise.all([state_fetcher, transitions_fetcher, current_state_fetcher, current_iteration_fetcher]).then(() => {
-        this.state_class_mapping[this.to_state_id(this.current_iteration - 1, this.current_state.id)] = this.current_state_class;
-
-        var selected_transition_id = this.$route.query.selected_transition_id;
-        if (selected_transition_id) {
-          this.on_transition_selected(selected_transition_id);
-        }
-
-        this.initialized = true;
-      });
-    });
   },
   methods: {
+    async refetch() {
+      var workflow_id = this.$route.params.workflow_id;
+      var workflow_object_id = this.$route.params.object_id;
+      http.get(`/workflow/get/${workflow_id}/`, response => {
+        this.workflow = Workflow.of(response.data.id, response.data.content_type, response.data.initial_state, response.data.field_name);
+
+        var object_identifier_fetcher = http.get(`/workflow-object/identify/${this.workflow.id}/${workflow_object_id}/`, response => {
+          this.object_identifier = response.data;
+        });
+
+        var current_state_fetcher = http.get(`/workflow-object/current-state/${this.workflow.id}/${workflow_object_id}/`, response => {
+          this.current_state = State.of(response.data.id, response.data.label).of_description(response.data.description);
+        });
+
+        var current_iteration_fetcher = http.get(`/workflow-object/current-iteration/${this.workflow.id}/${workflow_object_id}/`, response => {
+          this.current_iteration = response.data;
+        });
+
+        var state_fetcher = this.get_states(workflow_id, workflow_object_id).then(states => (this.states = states));
+        var transitions_fetcher = this.get_transitions(workflow_id, workflow_object_id)
+          .then(transitions => (this.transitions = transitions))
+          .then(() => {
+            var that = this;
+            this.transitions.forEach(transition => {
+              if (transition.is_done) {
+                that.state_class_mapping[transition.source_state_id] = that.done_state_class;
+                that.state_class_mapping[transition.destination_state_id] = that.done_state_class;
+              } else if (transition.is_cancelled) {
+                that.state_class_mapping[transition.destination_state_id] = that.cancelled_state_class;
+              } else {
+                that.state_class_mapping[transition.destination_state_id] = that.pending_state_class;
+              }
+            });
+          });
+
+        Promise.all([state_fetcher, transitions_fetcher, current_state_fetcher, current_iteration_fetcher]).then(() => {
+          this.state_class_mapping[this.to_state_id(this.current_iteration - 1, this.current_state.id)] = this.current_state_class;
+
+          var selected_transition_id = this.$route.query.selected_transition_id;
+          if (selected_transition_id) {
+            this.on_transition_selected(selected_transition_id);
+          }
+
+          this.initialized = true;
+        });
+      });
+    },
     to_state_id(iteration, state_id) {
       return `${iteration}-${state_id}`;
     },
