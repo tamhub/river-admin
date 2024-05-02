@@ -24,7 +24,7 @@ store.commit("initialiseStore");
 Vue.use(VueRouter);
 
 var router = new VueRouter({
-  mode: "history",
+  // mode: "history",
   routes: [
     {
       path: "/login",

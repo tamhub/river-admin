@@ -3,7 +3,7 @@
   "version": "0.7.0",
   "private": true,
   "scripts": {
-    "serve": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --port 3000",
+    "serve": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --port 8000",
     "build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
     "_fix_html": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' ./river_admin/templates/index.html",
     "_fix_js": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' $(find ./river_admin/static/ -type f -iname '*.js')",
