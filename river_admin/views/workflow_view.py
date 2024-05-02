@@ -84,12 +84,25 @@ def list_transitions(request, workflow_id):
     return Response(TransitionDto(workflow.transitions.all(), many=True).data, status=HTTP_200_OK)
 
 
+def get_state(request):
+    state_query_param = request.query_params.get("state", None)
+    if state_query_param:
+        return get_object_or_404(State.objects.all(), pk=state_query_param)
+    return None
+
+
 @get(r'workflow/object/list/<int:workflow_pk>/')
 def list_workflow_objects(request, workflow_pk):
     workflow = get_object_or_404(Workflow.objects.all(), pk=workflow_pk)
     model_class = workflow.content_type.model_class()
-    registered_admin = river_admin.site.get(model_class, workflow.field_name, river_admin.DefaultRiverAdmin.of(model_class, workflow.field_name))
-    return Response({"headers": registered_admin.admin_list_displays, "workflow_objects": list(registered_admin.get_objects())}, status=HTTP_200_OK)
+    workflow_admin = river_admin.site.get(model_class, workflow.field_name,
+                                          river_admin.DefaultRiverAdmin.of(model_class, workflow.field_name))
+    state = get_state(request)
+    return Response({
+        "headers": workflow_admin.admin_list_displays,
+        "workflow_objects": list(workflow_admin.get_objects(state=state))},
+        status=HTTP_200_OK
+    )
 
 
 @get(r'workflow/metadata/')
