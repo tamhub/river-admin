@@ -4,7 +4,8 @@ module.exports = {
   outputDir: __dirname + "/river_admin/templates/",
   assetsDir: "../static/",
   devServer: {
-    proxy: "http://127.0.0.1:8000/",
+    proxy: "http://127.0.0.1:3000/",
+    historyApiFallback: true, // Add this line
   },
 
   configureWebpack: {
