@@ -22,9 +22,9 @@ const store = new Vuex.Store({
       state.user.token = null;
     },
     initLogout(state) {
-      window.location.replace(
-        `${BASE_URL}/auth/logout?next=${window.location.origin}/${TENANT}/logout?success=true`
-      );
+      const logoutUrl = `${BASE_URL}/auth/logout?next=${window.location.origin}${TENANT}/logout?success=true`;
+
+      window.location.replace(logoutUrl);
     },
   },
 });
