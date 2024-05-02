@@ -18,9 +18,6 @@ export default {
         const tokenParam = params.t;
         if (tokenParam) {
             const token = JSON.parse(tokenParam.replaceAll("'", '"'));
-            // Cookies.set("access_token", token.access);
-            // Cookies.set("refresh_token", token.refresh);
-            console.log(token);
 
             if (token.access) {
 
@@ -28,15 +25,14 @@ export default {
                 auth.has_view_permission(WORKFLOW, yes => {
                     if (yes) {
                         if (this.$route.params.nextUrl) {
-                            window.location.href = `${window.location.origin}/${TENANT}`;
+                            this.$router.push({name: 'home'});
                         } else {
-                            window.location.href = `${window.location.origin}/${TENANT}`;
+                            this.$router.push({name: 'home'});
                         }
                     } else {
                         this.$store.commit("initLogout");
                         emit_error(["You must have the permission to view the workflows!"], 10000);
                     }
-                    console.log(yes);
                 });
             }
             else {
@@ -46,7 +42,7 @@ export default {
 
 
         setTimeout(() => {
-            window.location.href = `${window.location.origin}/${TENANT}`;
+            this.$router.push({name: 'home'});
         }, 1000);
 
     },

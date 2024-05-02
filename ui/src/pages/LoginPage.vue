@@ -112,12 +112,14 @@ export default {
   components: {
     SplashScreen,
   },
-  mounted() {
-    const from = `${window.location.origin}${TENANT}/` || "/";
-    const url = `${BASE_URL}/api/auth/login?src=fe&next=${window.location.origin}${TENANT}/loading?from=${from}`
-    setTimeout(() => {
-      window.location.replace(url);
-    }, 300);
+ mounted() {
+  const extra = process.env.NODE_ENV == "production" ? "/" : "";
+    const from = window.location.origin + extra + this.$router.resolve({ name: 'home' }).href;
+    const next = window.location.origin + extra + this.$router.resolve({ name: 'loading' }).href;
+
+    const url = `${BASE_URL}/api/auth/login?src=fe&next=${next}?from=${from}`;
+    console.log(url);
+      window.location.href = url;
 
   },
 };
