@@ -12,6 +12,15 @@
           </h1>
         </v-col>
       </v-row>
+      <template v-if="states">
+
+        <v-row v-if="states.length > 0">
+          <v-col class="max-w-xs">
+            <v-select item-text="title" item-value="value" placeholder="Select State" v-model="selectedState"
+              :items="states" outlined clearable></v-select>
+          </v-col>
+        </v-row>
+      </template>
       <v-row justify="center" align="center">
         <v-col>
           <v-data-table :headers="headers" :items="workflow_objects" :items-per-page="10"
@@ -104,6 +113,7 @@ import { Workflow } from "@/models/models";
 import { emit_success } from "@/helpers/event_bus";
 import { auth, WORKFLOW } from "@/helpers/auth";
 import http from "@/helpers/http";
+import { F } from "core-js/modules/_export";
 
 export default {
   name: "ListWorkflowObjectsPage",
@@ -132,25 +142,45 @@ export default {
       "field_name": "Field Name",
       "my_state_field": "Status"
     },
+    states: [],
+    selectedState: null
   }),
   watch: {
-    $route(to, from) {
-      if (to.params.workflow_id != from.params.workflow_id) {
-        this.load();
-      }
+    '$route.params': {
+      handler: function (newVal, oldVal) {
+        if (newVal.workflow_id !== oldVal.workflow_id) {
+          this.load();
+        }
+      },
+      deep: true
+    },
+    selectedState(newVal, oldVal) {
+      this.load();
     }
-  },
-  mounted() {
+  }, mounted() {
+    console.log(this.$route.params.workflow_id);
+
+    if (this.$route.query.state) {
+      this.selectedState = this.$route.query.state;
+    }
+
     this.load();
   },
   methods: {
     load() {
+
       this.initialized = false;
+      http.get("/state/list/", response => {
+        this.states = response.data.map(state => ({ value: state.id, title: state.label }));
+      });
       var workflow_id = this.$route.params.workflow_id;
+      const workflow_get_url = `/workflow/get/${workflow_id}/`;
       var workflow_fetcher = http.get(
-        `/workflow/get/${workflow_id}/`,
+        workflow_get_url,
         response => (this.workflow = Workflow.of(response.data.id, response.data.content_type, response.data.initial_state, response.data.field_name))
       );
+
+
 
       var change_workflow_permission_checker = auth.has_change_permission(WORKFLOW, answer => {
         this.has_change_workflow_permission = answer;
@@ -170,8 +200,9 @@ export default {
     },
     fetchWorkflowObjects() {
       this.workflow_object_loading = true;
+      const workflow_object_list_url = this.selectedState ? `/workflow/object/list/${this.workflow.id}/?state=${this.selectedState}` : `/workflow/object/list/${this.workflow.id}/`;
       return http
-        .get(`/workflow/object/list/${this.workflow.id}/`, response => {
+        .get(workflow_object_list_url, response => {
           this.headers = response.data.headers
             .map(key => ({ text: this.replaceList[key] || key, value: key, align: "left" }))
             .concat([{ text: "Actions", value: "action", sortable: false }]);
@@ -182,13 +213,13 @@ export default {
     goToTimeline(item) {
       this.$router.push({
         name: "edit-workflow-object-timeline",
-        params: { workflow_id: this.workflow.id, object_id: item.pk }
+        params: { workflow_id: this.workflow.id, object_id: item.id }
       });
     },
     goToViewTimeline(item) {
       this.$router.push({
         name: "view-workflow-object-timeline",
-        params: { workflow_id: this.workflow.id, object_id: item.pk }
+        params: { workflow_id: this.workflow.id, object_id: item.id }
       });
     },
     showDeletingDialog(workflow_object) {
@@ -215,6 +246,6 @@ export default {
     getItemTitle(item) {
       return this.replaceList[item.content_type.model] || item.content_type.model
     }
-  }
+  },
 };
 </script>

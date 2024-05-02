@@ -40,8 +40,7 @@ export default {
     var that = this;
 
     on_logout(() => {
-      this.$store.commit("unSetAuthToken");
-      this.$router.push({ name: "login" });
+      this.$store.commit("initLogout");
     });
 
     on_error((errors, timeout) => {

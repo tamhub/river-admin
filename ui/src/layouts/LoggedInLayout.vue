@@ -31,9 +31,12 @@
       </AvatarFallback>
     </AvatarRoot> -->
     <Dropdown class=" absolute top-8 right-8">
+
       <template v-slot:button="{ toggleDropdown }">
         <button @click="toggleDropdown" class="bg-[#0028B3] text-[#99A9E1] w-10 h-10 rounded-full text-xl">
           {{ userInitials }}
+          <v-tooltip activator="parent" location="bottom">Tooltip</v-tooltip>
+
         </button>
       </template>
 
@@ -85,26 +88,35 @@
                 </v-list-item>
 
 
-                <v-list dense>
-                  <v-list-item :class="isCurrentPath(item) ? 'bg-[#F6F6F6] text-[#5E45FF]' : ''" class="mb-2"
-                    :disabled="item.disabled" :id="item.id" v-for="item in items" :key="item.title" @click="goTo(item)"
-                    link>
-                    <v-list-item-icon>
-                      <Icon :name="item.icon" :color="isCurrentPath(item) ? '#5E45FF' : ''" />
-                    </v-list-item-icon>
+                <v-list-item :class="isCurrentPath(item) ? 'bg-[#F6F6F6] text-[#5E45FF]' : ''" class="mb-2"
+                  :disabled="item.disabled" :id="item.id" v-for="item in items" :key="item.title" @click="goTo(item)"
+                  link :data-popover="item.title">
+                  <v-tooltip content-class="tippy" right>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-list-item-icon v-on="!mini ? {} : on" v-bind="attrs">
+                        <Icon :name="item.icon" :color="isCurrentPath(item) ? '#5E45FF' : ''" />
+                      </v-list-item-icon>
+                    </template>
+                    <span>{{ item.title }}</span>
+                  </v-tooltip>
 
-                    <v-list-item-content>
-                      <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
 
 
                 <v-list dense>
                   <v-list-item :id="item.id" v-for="item in workflow_items" :key="item.title" @click="goTo(item)" link>
-                    <v-list-item-icon>
-                      <Icon name="list" :color="isCurrentItem(item) ? '#5E45FF' : ''" />
-                    </v-list-item-icon>
+                    <v-tooltip content-class="tippy" right>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-list-item-icon v-on="!mini ? {} : on" v-bind="attrs">
+                          <Icon name="list" :color="isCurrentItem(item) ? '#5E45FF' : ''" />
+                        </v-list-item-icon>
+                      </template>
+                      <span>{{ getItemTitle(item) }}</span>
+                    </v-tooltip>
+
 
                     <v-list-item-content>
                       <v-list-item-title>{{ getItemTitle(item) }}</v-list-item-title>
@@ -304,5 +316,33 @@ export default {
 
 .app-title {
   font-weight: bolder;
+}
+
+.v-tooltip__content.tippy {
+  box-shadow: -1px 5px 11px 0px #5E45FF1A;
+  border-radius: 8px;
+  padding: 10px 12px 10px 12px;
+  background: #FFFFFF;
+  opacity: 1 !important;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+  color: #41454E;
+  transform: translateX(18px);
+
+
+}
+
+.v-tooltip__content.tippy:before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  /* Arrow color */
 }
 </style>

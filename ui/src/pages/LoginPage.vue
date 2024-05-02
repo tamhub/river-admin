@@ -77,7 +77,7 @@ export default {
                 this.$router.push({ name: "home" });
               }
             } else {
-              this.$store.commit("unSetAuthToken");
+              this.$store.commit("initLogout");
               emit_error(["You must have the permission to view the workflows!"], 10000);
             }
           });
@@ -92,28 +92,33 @@ export default {
 
 
 <template>
-  <SplashScreen />
+  <section class="w-screen h-screen flex items-center justify-center">
+    <SplashScreen />
+  </section>
 </template>
 
 <script>
 import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import SplashScreen from '@/components/SplashScreen';
-
+import { BASE_URL, TENANT } from '@/helpers/constants';
 export default {
   setup(props) {
-    const router = useRouter();
 
     onMounted(() => {
-      const BASE_URL = "https://core.verse-stg.tam.run";
-      const finalAppName = "/#/";
-      const from = router.currentRoute.value.query.from || "/";
-      window.location.replace(
-        `${BASE_URL}/api/auth/login?src=fe&next=${window.location.origin}${finalAppName}/loading?from=${from}`
-      );
     });
 
     return {};
-  }
+  },
+  components: {
+    SplashScreen,
+  },
+  mounted() {
+    const from = `${window.location.origin}${TENANT}/` || "/";
+    const url = `${BASE_URL}/api/auth/login?src=fe&next=${window.location.origin}${TENANT}/loading?from=${from}`
+    setTimeout(() => {
+      window.location.replace(url);
+    }, 300);
+
+  },
 };
 </script>
