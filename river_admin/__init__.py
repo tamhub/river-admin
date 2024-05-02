@@ -35,9 +35,9 @@ class RiverAdmin(object):
         return cls.list_displays or ["pk", cls._field_name]
 
     @classmethod
-    def get_objects(cls):
+    def get_objects(cls, state=None):
         headers = cls.admin_list_displays
-        for obj in cls._model_class.objects.all():
+        for obj in cls._model_class.objects.filter(**{cls._field_name: state} if state else {}):
             yield dict({key: str(cls._get_value(obj, key)) for key in headers}, **cls._get_default_values(obj))
 
     @classmethod
