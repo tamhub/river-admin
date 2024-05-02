@@ -291,6 +291,9 @@ export default {
         inner.selectAll("g.node rect").attr("rx", "20").attr("ry", "20");
 
         inner.selectAll("g.node").each(function (nodeId, index) {
+          if (index === 0) { // Apply 'root' class only to the first node
+            d3.select(this).classed("root", true);
+          }
           if (that.editable && index !== 0) {
             let nodeElement = d3.select(this);
             let nodeWidth = nodeElement.node().getBBox().width;
@@ -522,6 +525,12 @@ g.node-default>rect {
   transition: all 0.3s ease-in-out;
 }
 
+g.node-default.root>rect {
+  stroke: #4caf50 !important;
+  box-shadow: 0 0 0 2px #4caf50;
+  fill: #4caf5022 !important;
+}
+
 g.node-default>g.label {
   /* stroke: black !important; */
   stroke-width: 0.3px !important;
@@ -531,7 +540,7 @@ g.node-default>g.label {
 g.node-default.selected>rect {
   stroke: #5E45FF !important;
   box-shadow: 0 0 0 2px #5E45FF;
-
+  fill: #5E45FF22 !important;
 }
 
 g.node-default>g.label.current {
@@ -544,6 +553,7 @@ g.node-default>g.label.current {
 g.node-default.current>rect {
   stroke: #5E45FF !important;
   box-shadow: 0 0 0 2px #5E45FF;
+  fill: #5E45FF22 !important;
 }
 
 g.node-default>g.label.done {
@@ -556,6 +566,7 @@ g.node-default>g.label.done {
 g.node-default.done>rect {
   stroke: #4caf50 !important;
   box-shadow: 0 0 0 2px #4caf50;
+  fill: #4caf5022 !important;
 }
 
 g.node-default>g.label.cancelled {
@@ -568,11 +579,13 @@ g.node-default>g.label.cancelled {
 g.node-default.cancelled>rect {
   stroke: #4caf50 !important;
   box-shadow: 0 0 0 2px #4caf50;
+  fill: #4caf5022 !important;
 }
 
 g.edge-SELECTED>rect {
   stroke: #5E45FF !important;
   stroke-width: 2.5px !important;
+
 }
 
 g.edge-SELECTED>path.path {

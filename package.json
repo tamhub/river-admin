@@ -3,8 +3,8 @@
   "version": "0.7.0",
   "private": true,
   "scripts": {
-    "serve": "set NODE_OPTIONS=--openssl-legacy-provider &&  vue-cli-service serve",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider &&  vue-cli-service build",
+    "serve": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --port 3000",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
     "_fix_html": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' ./river_admin/templates/index.html",
     "_fix_js": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' $(find ./river_admin/static/ -type f -iname '*.js')",
     "_fix_js_map": "sed -i '' 's/\\(\\/\\{0,1\\}[a-zA-Z0-9\\-_\\.]*\\)*\\(\\/\\{0,1\\}static\\/\\)/\\/static\\//g' $(find ./river_admin/static/ -type f -iname '*.js.map')",
@@ -28,6 +28,7 @@
     "serialize-javascript": "^3.1.0",
     "vue": "^2.6.10",
     "vue-codemirror": "^4.0.6",
+    "vue-js-popover": "^1.2.1",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.1.3",
     "vue-smooth-dnd": "^0.8.0",

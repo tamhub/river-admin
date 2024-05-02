@@ -1,32 +1,36 @@
-import Vuex from 'vuex'
-import Vue from 'vue'
-
+import Vuex from "vuex";
+import Vue from "vue";
+import { BASE_URL, TENANT } from "@/helpers/constants";
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
-    state: {
-        user: {
-        }
+  state: {
+    user: {},
+  },
+  mutations: {
+    initialiseStore(state) {
+      if (localStorage.getItem("store")) {
+        this.replaceState(
+          Object.assign(state, JSON.parse(localStorage.getItem("store")))
+        );
+      }
     },
-    mutations: {
-        initialiseStore(state) {
-            if (localStorage.getItem('store')) {
-                this.replaceState(
-                    Object.assign(state, JSON.parse(localStorage.getItem('store')))
-                );
-            }
-        },
-        setAuthToken(state, token) {
-            state.user.token = token;
-        },
-        unSetAuthToken(state) {
-            state.user.token = null;
-        }
-    }
-})
-
-store.subscribe((mutation, state) => {
-    localStorage.setItem('store', JSON.stringify(state));
+    setAuthToken(state, token) {
+      state.user.token = token;
+    },
+    unSetAuthToken(state) {
+      state.user.token = null;
+    },
+    initLogout(state) {
+      window.location.replace(
+        `${BASE_URL}/auth/logout?next=${window.location.origin}/${TENANT}/logout?success=true`
+      );
+    },
+  },
 });
 
-export default store
+store.subscribe((mutation, state) => {
+  localStorage.setItem("store", JSON.stringify(state));
+});
+
+export default store;
