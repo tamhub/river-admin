@@ -136,7 +136,7 @@ export default {
       "budgetexpense": "Tarjim",
       "budgetstage": "Stages",
       "pk": "ID",
-      "river_status": "Status",
+      "river_status": "Workflow Status",
       "content_type": "Content Type",
       "initial_state": "Initial State",
       "field_name": "Field Name",

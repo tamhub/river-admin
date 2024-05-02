@@ -113,16 +113,16 @@ export default {
     SplashScreen,
   },
  mounted() {
-  const extra = process.env.NODE_ENV == "production" ? `/${TENANT}` : "";
-    const from = window.location.origin + extra + this.$router.resolve({ name: 'home' }).href;
-    const next = window.location.origin + extra + this.$router.resolve({ name: 'loading' }).href;
+    const extra = `/${TENANT}`;
+    const from = window.location.origin + extra + '';
+    const next = window.location.origin + extra + '/loading';
 
-    const url = `${BASE_URL}/api/auth/login?src=fe&next=${next}?from=${from}`;
-      window.location.href = url;
+    const url = `${BASE_URL}/api/auth/login?next=${next}?from=${from}`;
+    window.location.replace(url);
 
   },
 };
 </script>
 
 
-https://core.verse-stg.tam.run/api/auth/login?src=fe&next=https://core.verse-stg.tam.run/river-admin/loading?from=https://core.verse-stg.tam.run/river-admin/ 
+https://core.verse-stg.tam.run/api/auth/login?next=https://core.verse-stg.tam.run/river-admin/loading?from=https://core.verse-stg.tam.run/river-admin/ 
