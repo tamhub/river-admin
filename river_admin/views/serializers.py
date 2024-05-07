@@ -100,13 +100,13 @@ class CreateWorkflowDto(serializers.ModelSerializer):
 class TransitionMetaDto(serializers.ModelSerializer):
     class Meta:
         model = TransitionMeta
-        fields = ['id', 'workflow', 'source_state', 'destination_state']
+        fields = ['id', 'workflow', 'source_state', 'destination_state', 'name']
 
 
 class CreateTransitionMetaDto(serializers.ModelSerializer):
     class Meta:
         model = TransitionMeta
-        fields = ["workflow", "source_state", "destination_state"]
+        fields = ["workflow", "source_state", "destination_state", 'name']
 
 
 # TRANSITION APPROVAL META

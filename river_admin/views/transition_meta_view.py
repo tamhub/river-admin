@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from river.models import TransitionMeta
 
-from river_admin.views import get, post
+from river_admin.views import get, post, patch
 from river_admin.views.serializers import TransitionMetaDto, CreateTransitionMetaDto, TransitionHookDto, TransitionApprovalMetaDto
 
 
@@ -51,3 +51,12 @@ def list_transition_hooks(request, transition_meta_id):
         ).data,
         status=HTTP_200_OK
     )
+
+
+@patch(r'transition-meta/update/<int:pk>/')
+def update_it(request, pk):
+    transition_meta = get_object_or_404(TransitionMeta.objects.all(), pk=pk)
+    serializer = TransitionMetaDto(transition_meta, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=HTTP_200_OK)

@@ -50,6 +50,10 @@ def delete(path, **options):
     return _path(path, "DELETE", **options)
 
 
+def patch(path, **options):
+    return _path(path, "PATCH", **options)
+
+
 def exception_handler(exc, context):
     handled_exception = drf_exception_handler(exc, context)
     if handled_exception:
