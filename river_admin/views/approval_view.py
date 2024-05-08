@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from river.models import State
+from river.models import State, TransitionMeta
 from river.models.fields.state import StateField
 
 from river_admin.views import post
@@ -168,9 +168,18 @@ def list_available_approvals(request):
             as_user=request.user)
 
         class StateSerializer(serializers.ModelSerializer):
+            transition_meta_name = serializers.SerializerMethodField()
+
             class Meta:
                 model = State
                 fields = '__all__'
+
+            def get_transition_meta_name(self, obj):
+                return TransitionMeta.objects.filter(
+                    workflow=workflow_object.river.workflow,
+                    source_state=getattr(workflow_object.river, status_field_name).value,
+                    destination_state=obj
+                ).values('name') or None
 
         return Response(StateSerializer(available_approvals, many=True).data)
     except Exception as e:
