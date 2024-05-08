@@ -1,8 +1,8 @@
+import { BASE_URL } from "@/helpers/constants";
+import { CAN_NOT_DELETE_DUE_TO_PROTECTION } from "@/helpers/errors";
+import { emit_error } from "@/helpers/event_bus";
 import store from "@/store";
 import axios from "axios";
-import { CAN_NOT_DELETE_DUE_TO_PROTECTION } from "@/helpers/errors";
-import { emit_logout, emit_error } from "@/helpers/event_bus";
-import { BASE_URL } from "@/helpers/constants";
 
 const getHeaders = () => ({
   Authorization: `Bearer ${store.state.user.token}`,
@@ -46,6 +46,12 @@ class Http {
   put(url, data, callback) {
     return this._request(
       { method: "put", url, data, headers: getHeaders() },
+      callback
+    );
+  }
+  patch(url, data, callback) {
+    return this._request(
+      { method: "patch", url, data, headers: getHeaders() },
       callback
     );
   }
