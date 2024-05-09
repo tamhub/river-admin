@@ -175,11 +175,18 @@ def list_available_approvals(request):
                 fields = '__all__'
 
             def get_transition_meta_name(self, obj):
-                return TransitionMeta.objects.filter(
-                    workflow=workflow_object.river.workflow,
-                    source_state=getattr(workflow_object.river, status_field_name).value,
+                """
+                return str or None if no transition meta is found
+                """
+                from river.models import Workflow
+                workflow = Workflow.objects.get(content_type=ContentType.objects.get_for_model(workflow_object.__class__))
+                source_state = getattr(workflow_object, status_field_name)
+                transition_meta = TransitionMeta.objects.filter(
+                    workflow=workflow,
+                    source_state=source_state,
                     destination_state=obj
-                ).values('name') or None
+                ).first()
+                return transition_meta.name if transition_meta else None
 
         return Response(StateSerializer(available_approvals, many=True).data)
     except Exception as e:
