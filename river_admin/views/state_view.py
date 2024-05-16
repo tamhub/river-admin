@@ -73,7 +73,8 @@ def update_instances_with_previous_state(workflow, state):
         previous_transition = TransitionApproval.objects.filter(
             workflow=workflow,
             transition__destination_state=state,
-            workflow_object_id=instance.pk
+            object_id=instance.pk,
+            content_type=workflow.content_type
         ).order_by('-transaction_date').first()
 
         if previous_transition:
