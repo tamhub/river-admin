@@ -1,3 +1,4 @@
+from django.db.models import ProtectedError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -34,7 +35,10 @@ def create_state(request):
 @delete(r'state/delete/<int:pk>/')
 def delete_state(request, pk):
     state = get_object_or_404(State.objects.all(), pk=pk)
-    state.delete()
+    try:
+        state.delete()
+    except ProtectedError as e:
+        return Response({"message": str(e)}, status=HTTP_400_BAD_REQUEST)
     return Response(status=HTTP_200_OK)
 
 
