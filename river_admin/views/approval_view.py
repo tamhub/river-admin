@@ -1,193 +1,205 @@
+from typing import Tuple, List, Type
+
 from django.contrib.contenttypes.models import ContentType
-from rest_framework import serializers
+from django.db.models import Model
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from river.models import State, TransitionMeta
+from river.models import State, TransitionMeta, Workflow
 from river.models.fields.state import StateField
 
 from river_admin.views import post
+from rest_framework import serializers
 
 
-def retrieve_requested_data(request):
+class RequestDataExtractor:
     """
-    Retrieve Requested Data
-
-    This method retrieves specific data from the provided request object.
-
-    Parameters:
-        request (object): The request object containing the desired data.
-
-    Returns:
-        tuple: A tuple containing the values of 'content_type_name', 'object_id', and 'destination_state' extracted from the request data.
-
+    Extracts the necessary parameters from the request data.
     """
-    return request.data.get('content_type_name'), request.data.get('object_id'), request.data.get('destination_state')
+    @staticmethod
+    def extract(request) -> Tuple[str, int, str, str]:
+        """
+        Extracts content type name, object ID, destination state, and state field name from the request.
+
+        Args:
+        request: The incoming HTTP request containing the data.
+
+        Returns:
+        Tuple containing content type name, object ID, destination state, and state field name.
+        """
+        content_type_name = request.data.get('content_type_name')
+        object_id = request.data.get('object_id')
+        destination_state = request.data.get('destination_state')
+        state_field_name = request.data.get('state_field_name', None)
+        return content_type_name, object_id, destination_state, state_field_name
 
 
-def get_linked_model_class(content_type_name):
+class ModelFetcher:
     """
-    Retrieves the model class associated with the given content type name.
-
-    Args:
-        content_type_name (str): The name of the content type.
-
-    Returns:
-        model_class (class): The model class associated with the content type.
-
-    Raises:
-        ContentType.DoesNotExist: If the content type does not exist in the database.
-
+    Fetches the model class and model instances based on the content type name and object ID.
     """
-    if not isinstance(content_type_name, str):
-        raise ValueError('content_type_name must be a string')
+    @staticmethod
+    def fetch_model_class(content_type_name: str) -> Type[Model]:
+        """
+        Fetches the model class from the content type name.
 
-    return get_object_or_404(ContentType.objects.all(), model=content_type_name).model_class()
+        Args:
+        content_type_name: The name of the model class to fetch.
+
+        Returns:
+        The Django model class.
+        """
+        if not isinstance(content_type_name, str):
+            raise ValueError('content_type_name must be a string')
+        return get_object_or_404(ContentType.objects.all(), model=content_type_name).model_class()
+
+    @staticmethod
+    def fetch_workflow_object(model_class: Type[Model], object_id: int) -> Model:
+        """
+        Fetches the workflow object instance by its ID.
+
+        Args:
+        model_class: The class of the model to fetch.
+        object_id: The primary key ID of the model instance.
+
+        Returns:
+        The model instance.
+        """
+        return get_object_or_404(model_class.objects.all(), pk=object_id)
 
 
-def get_related_workflow_object(model_class, object_id):
+class StateFieldUtil:
     """
-    Get the related workflow object for a given model and object ID.
-
-    :param model_class: The model class from which to get the related workflow object.
-    :type model_class: django.db.models.Model
-    :param object_id: The ID of the object for which to get the related workflow object.
-    :type object_id: int
-    :return: The related workflow object.
-    :rtype: django.db.models.Model
-    :raises django.http.Http404: If the related workflow object does not exist.
+    Utility class for handling operations related to state fields within models.
     """
-    return get_object_or_404(model_class.objects.all(), pk=object_id)
+    @staticmethod
+    def list_state_fields(model_class: Type[Model]) -> List[str]:
+        """
+        Lists the state fields present in the model.
+
+        Args:
+        model_class: The model class to inspect.
+
+        Returns:
+        A list of state field names.
+        """
+        return [field.name for field in model_class._meta.get_fields() if isinstance(field, StateField)]
+
+    @staticmethod
+    def is_valid_state_field(model_class: Type[Model], field_name: str) -> bool:
+        """
+        Checks if a given field name is a valid state field for the specified model.
+
+        Args:
+        model_class: The model class to check.
+        field_name: The field name to validate.
+
+        Returns:
+        True if the field is a valid state field, False otherwise.
+        """
+        return any(isinstance(field, StateField) and field.name == field_name for field in model_class._meta.get_fields())
 
 
-def get_related_state_field_names(model_class):
+class TransitionApprover:
     """
-    Get the names of related state fields for a given model class.
-
-    :param model_class: The model class for which to retrieve the related state field names.
-    :type model_class: type
-    :return: A list of names of related state fields for the given model class.
-    :rtype: list[str]
+    Handles the approval process for transitions in workflow states.
     """
-    return [field.name for field in model_class._meta.get_fields() if isinstance(field, StateField)]
+    @staticmethod
+    def approve_all(user, workflow_object: Model, state_field_names: List[str], destination_state: str = None):
+        """
+        Approves transitions for all specified state fields on a given workflow object.
+
+        Args:
+        user: The user who is approving the transition.
+        workflow_object: The workflow object undergoing transition.
+        state_field_names: List of state field names to process for approval.
+        destination_state: The destination state label to transition to, if specified.
+        """
+        for state_field_name in state_field_names:
+            TransitionApprover.approve_for_field(user, workflow_object, state_field_name, destination_state)
+
+    @staticmethod
+    def approve_for_field(user, workflow_object: Model, state_field_name: str, destination_state: str = None):
+        """
+        Approves the transition for a single state field on a given workflow object.
+
+        Args:
+        user: The user who is approving the transition.
+        workflow_object: The workflow object undergoing transition.
+        state_field_name: The state field to process.
+        destination_state: The destination state label to transition to, if specified.
+        """
+        river_attr = getattr(workflow_object, "river", None)
+        if river_attr:
+            state_field = getattr(river_attr, state_field_name, None)
+            if state_field:
+                destination = State.objects.get(label=destination_state) if destination_state else None
+                state_field.approve(as_user=user, next_state=destination)
 
 
 @post(r'transition/approve/')
-def approve_transition(request):
+def approve_transition(request) -> Response:
     """
-    Approve Transition
+    Endpoint for approving transitions for workflow objects.
 
-    Processes the approval of a transition in a workflow.
-
-    Parameters:
-        request (HttpRequest): The HTTP request object.
+    Args:
+    request: The incoming HTTP request.
 
     Returns:
-        Response: The HTTP response indicating the status of the processing.
+    HTTP response indicating success.
     """
-    content_type_name, object_id, destination_state = retrieve_requested_data(request)
-    model_class = get_linked_model_class(content_type_name)
-    workflow_object = get_related_workflow_object(model_class, object_id)
-    status_field_names = get_related_state_field_names(model_class)
-    try:
-        approve_transitions(request.user, workflow_object, status_field_names, destination_state)
-        return Response("Transitions approved successfully.")
-    except Exception as e:
-        raise ValidationError(f"Error approving transitions: {e}", code=HTTP_400_BAD_REQUEST)
+    data = RequestDataExtractor.extract(request)
+    model_class = ModelFetcher.fetch_model_class(data[0])
+    workflow_object = ModelFetcher.fetch_workflow_object(model_class, data[1])
+    state_field_names = [data[3]] if data[3] and StateFieldUtil.is_valid_state_field(model_class, data[3]) else StateFieldUtil.list_state_fields(model_class)
+
+    TransitionApprover.approve_all(request.user, workflow_object, state_field_names, data[2])
+    return Response("Transitions approved successfully.")
 
 
-def approve_transitions(user, workflow_object, status_field_names, destination_state=None):
-    """
-    Approves transitions for multiple status fields.
+class StateSerializer(serializers.ModelSerializer):
+    transition_meta_name = serializers.SerializerMethodField()
 
-    Parameters:
-    - user (str): The user who is approving the transitions.
-    - workflow_object (object): The object on which the transitions will be approved.
-    - status_field_names (list[str]): A list of status field names for which the transitions will be approved.
+    class Meta:
+        model = State
+        fields = '__all__'
 
-    Returns:
-    None
+    def get_transition_meta_name(self, obj):
+        """
+        Retrieves the transition metadata name for a given state object.
 
-    Example Usage:
-    user = "John"
-    workflow_object = WorkflowObject()
-    status_fields = ["Status1", "Status2"]
-    approve_transitions(user, workflow_object, status_fields)
-    """
-    for status_field_name in status_field_names:
-        approve_single_transition(user, workflow_object, status_field_name, destination_state)
+        Args:
+        obj: The state object being serialized.
 
-
-def approve_single_transition(user, workflow_object, status_field_name, destination_state=None):
-    """
-    Approves a single transition in the workflow for the specified user.
-
-    Parameters:
-    - user (object): The user who is approving the transition.
-    - workflow_object (object): The object containing the workflow.
-    - status_field_name (str): The name of the status field associated with the transition.
-
-    Returns: None
-
-    Example usage:
-    approve_single_transition(user, workflow_object, "status")
-
-    Note:
-    This method assumes that the workflow object has a property called "river" and that the status field identified by status_field_name exists and is callable.
-    """
-    river_attr = getattr(workflow_object, "river", None)
-    if river_attr and hasattr(river_attr, status_field_name):
-        status_field_attr = getattr(river_attr, status_field_name)
-        if destination_state:
-            destination_state = State.objects.get(label=destination_state)
-            status_field_attr.approve(as_user=user, next_state=destination_state)
-        else:
-            status_field_attr.approve(as_user=user)
+        Returns:
+        The name of the transition metadata.
+        """
+        workflow = Workflow.objects.get(content_type=ContentType.objects.get_for_model(self.context['workflow_object'].__class__))
+        source_state = getattr(self.context['workflow_object'], self.context['status_field_name'])
+        transition_meta = TransitionMeta.objects.filter(workflow=workflow, source_state=source_state, destination_state=obj).first()
+        return transition_meta.name if transition_meta else None
 
 
 @post(r'list-available-approvals/')
 def list_available_approvals(request):
     """
-    List Available Approvals
+    Lists available approvals for the specified workflow object based on its current state.
 
-    Lists the available approvals for a user.
-
-    Parameters:
-        request (HttpRequest): The HTTP request object.
+    Args:
+    request: The incoming HTTP request.
 
     Returns:
-        Response: The HTTP response containing the list of available approvals.
+    HTTP response with serialized state information or an error message.
     """
-    content_type_name, object_id, _ = retrieve_requested_data(request)
-    model_class = get_linked_model_class(content_type_name)
-    workflow_object = get_related_workflow_object(model_class, object_id)
-    status_field_name = get_related_state_field_names(model_class)[0]
+    data = RequestDataExtractor.extract(request)
+    model_class = ModelFetcher.fetch_model_class(data[0])
+    workflow_object = ModelFetcher.fetch_workflow_object(model_class, data[1])
+    status_field_name = StateFieldUtil.list_state_fields(model_class)[0]
     try:
-        available_approvals = getattr(workflow_object.river, status_field_name).get_available_states(
-            as_user=request.user)
-
-        class StateSerializer(serializers.ModelSerializer):
-            transition_meta_name = serializers.SerializerMethodField()
-
-            class Meta:
-                model = State
-                fields = '__all__'
-
-            def get_transition_meta_name(self, obj):
-                """
-                return str or None if no transition meta is found
-                """
-                from river.models import Workflow
-                workflow = Workflow.objects.get(content_type=ContentType.objects.get_for_model(workflow_object.__class__))
-                source_state = getattr(workflow_object, status_field_name)
-                transition_meta = TransitionMeta.objects.filter(
-                    workflow=workflow,
-                    source_state=source_state,
-                    destination_state=obj
-                ).first()
-                return transition_meta.name if transition_meta else None
-
-        return Response(StateSerializer(available_approvals, many=True).data)
+        available_approvals = getattr(workflow_object.river, status_field_name).get_available_states(as_user=request.user)
+        serializer_context = {'workflow_object': workflow_object, 'status_field_name': status_field_name}
+        return Response(StateSerializer(available_approvals, many=True, context=serializer_context).data)
     except Exception as e:
         raise ValidationError(f"Error retrieving available approvals: {e}", code=HTTP_400_BAD_REQUEST)
+
