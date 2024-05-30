@@ -149,12 +149,17 @@ def approve_transition(request) -> Response:
     Returns:
     HTTP response indicating success.
     """
-    data = RequestDataExtractor.extract(request)
-    model_class = ModelFetcher.fetch_model_class(data[0])
-    workflow_object = ModelFetcher.fetch_workflow_object(model_class, data[1])
-    state_field_names = [data[3]] if data[3] and StateFieldUtil.is_valid_state_field(model_class, data[3]) else StateFieldUtil.list_state_fields(model_class)
+    content_type_name, object_id, destination_state, state_field_name = RequestDataExtractor.extract(request)
+    model_class = ModelFetcher.fetch_model_class(content_type_name)
+    workflow_object = ModelFetcher.fetch_workflow_object(model_class, object_id)
 
-    TransitionApprover.approve_all(request.user, workflow_object, state_field_names, data[2])
+    valid_state_fields = StateFieldUtil.list_state_fields(model_class)
+    if state_field_name and state_field_name in valid_state_fields:
+        state_field_names = [state_field_name]
+    else:
+        state_field_names = valid_state_fields
+
+    TransitionApprover.approve_all(request.user, workflow_object, state_field_names, destination_state)
     return Response("Transitions approved successfully.")
 
 
@@ -175,7 +180,10 @@ class StateSerializer(serializers.ModelSerializer):
         Returns:
         The name of the transition metadata.
         """
-        workflow = Workflow.objects.get(content_type=ContentType.objects.get_for_model(self.context['workflow_object'].__class__))
+        workflow = Workflow.objects.get(
+            content_type=ContentType.objects.get_for_model(self.context['workflow_object'].__class__),
+            field_name=self.context['status_field_name']
+        )
         source_state = getattr(self.context['workflow_object'], self.context['status_field_name'])
         transition_meta = TransitionMeta.objects.filter(workflow=workflow, source_state=source_state, destination_state=obj).first()
         return transition_meta.name if transition_meta else None
@@ -192,14 +200,22 @@ def list_available_approvals(request):
     Returns:
     HTTP response with serialized state information or an error message.
     """
-    data = RequestDataExtractor.extract(request)
-    model_class = ModelFetcher.fetch_model_class(data[0])
-    workflow_object = ModelFetcher.fetch_workflow_object(model_class, data[1])
-    status_field_name = StateFieldUtil.list_state_fields(model_class)[0]
+    content_type_name, object_id, destination_state, state_field_name = RequestDataExtractor.extract(request)
+    model_class = ModelFetcher.fetch_model_class(content_type_name)
+    workflow_object = ModelFetcher.fetch_workflow_object(model_class, object_id)
+
+    valid_state_fields = StateFieldUtil.list_state_fields(model_class)
+    if state_field_name and state_field_name in valid_state_fields:
+        selected_state_field_name = state_field_name
+    elif valid_state_fields:
+        selected_state_field_name = valid_state_fields[0]
+    else:
+        raise ValidationError("No valid state field found for this model.", code=HTTP_400_BAD_REQUEST)
+
     try:
-        available_approvals = getattr(workflow_object.river, status_field_name).get_available_states(as_user=request.user)
-        serializer_context = {'workflow_object': workflow_object, 'status_field_name': status_field_name}
+        available_approvals = getattr(workflow_object.river, selected_state_field_name).get_available_states(
+            as_user=request.user)
+        serializer_context = {'workflow_object': workflow_object, 'status_field_name': selected_state_field_name}
         return Response(StateSerializer(available_approvals, many=True, context=serializer_context).data)
     except Exception as e:
         raise ValidationError(f"Error retrieving available approvals: {e}", code=HTTP_400_BAD_REQUEST)
-
