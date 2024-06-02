@@ -162,7 +162,9 @@ def approve_transition(request) -> Response:
     try:
         TransitionApprover.approve_all(request.user, workflow_object, state_field_names, destination_state)
     except Exception as e:
-        raise ValidationError(f"Error approving transitions: {e}", code=HTTP_400_BAD_REQUEST)
+        return Response({
+            'message': f'Error approving transitions: {e}',
+        }, status=HTTP_400_BAD_REQUEST)
     return Response("Transitions approved successfully.")
 
 
