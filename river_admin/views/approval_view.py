@@ -135,12 +135,7 @@ class TransitionApprover:
             state_field = getattr(river_attr, state_field_name, None)
             if state_field:
                 destination = State.objects.get(label=destination_state) if destination_state else None
-                try:
-                    state_field.approve(as_user=user, next_state=destination)
-                except Exception as e:
-                    return Response({
-                        "message": f"Error approving transition: {e}"
-                    }, status=HTTP_400_BAD_REQUEST)
+                state_field.approve(as_user=user, next_state=destination)
 
 
 @post(r'transition/approve/')
@@ -164,7 +159,10 @@ def approve_transition(request) -> Response:
     else:
         state_field_names = valid_state_fields
 
-    TransitionApprover.approve_all(request.user, workflow_object, state_field_names, destination_state)
+    try:
+        TransitionApprover.approve_all(request.user, workflow_object, state_field_names, destination_state)
+    except Exception as e:
+        raise ValidationError(f"Error approving transitions: {e}", code=HTTP_400_BAD_REQUEST)
     return Response("Transitions approved successfully.")
 
 
