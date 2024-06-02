@@ -135,7 +135,12 @@ class TransitionApprover:
             state_field = getattr(river_attr, state_field_name, None)
             if state_field:
                 destination = State.objects.get(label=destination_state) if destination_state else None
-                state_field.approve(as_user=user, next_state=destination)
+                try:
+                    state_field.approve(as_user=user, next_state=destination)
+                except Exception as e:
+                    return Response({
+                        "message": f"Error approving transition: {e}"
+                    }, status=HTTP_400_BAD_REQUEST)
 
 
 @post(r'transition/approve/')
