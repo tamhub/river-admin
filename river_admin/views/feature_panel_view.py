@@ -7,9 +7,9 @@ from river.models.feature_panel import FeatureSetting
 from river_admin.views.serializers import FeatureSettingDto
 
 
-@get(r'feature_setting/get/<int:pk>/')
-def get_it(request, pk):
-    feature_setting = get_object_or_404(FeatureSetting.objects.all(), pk=pk)
+@get(r'feature_setting/get/<str:feature>/')
+def get_it(request, feature):
+    feature_setting = get_object_or_404(FeatureSetting.objects.all(), feature=feature)
     return Response(FeatureSettingDto(feature_setting).data, status=HTTP_200_OK)
 
 
@@ -18,30 +18,16 @@ def list_it(request):
     return Response(FeatureSettingDto(FeatureSetting.objects.all(), many=True).data, status=HTTP_200_OK)
 
 
-@post(r'feature_setting/create/')
-def create_it(request):
-    create_feature_setting_request = FeatureSettingDto(data=request.data)
-    if create_feature_setting_request.is_valid():
-        feature_setting = create_feature_setting_request.save()
-        return Response({"id": feature_setting.id}, status=HTTP_200_OK)
-    else:
-        return Response(create_feature_setting_request.errors, status=HTTP_400_BAD_REQUEST)
+@put(r'feature_setting/update/<str:feature>/')
+def update_it(request, feature):
+    try:
+        feature_setting = FeatureSetting.objects.get(feature=feature)
+        serializer = FeatureSettingDto(feature_setting, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+    except FeatureSetting.DoesNotExist:
+        serializer = FeatureSettingDto(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(feature=feature)
 
-
-@put(r'feature_setting/update/<int:pk>/')
-def update_it(request, pk):
-    feature_setting = get_object_or_404(FeatureSetting.objects.all(), pk=pk)
-    update_feature_setting_request = FeatureSettingDto(data=request.data, instance=feature_setting)
-
-    if update_feature_setting_request.is_valid():
-        update_feature_setting_request.save()
-        return Response({"message": "Feature setting is updated"}, status=HTTP_200_OK)
-    else:
-        return Response(update_feature_setting_request.errors, status=HTTP_400_BAD_REQUEST)
-
-
-@delete(r'feature_setting/delete/<int:pk>/')
-def delete_it(request, pk):
-    feature_setting = get_object_or_404(FeatureSetting.objects.all(), pk=pk)
-    feature_setting.delete()
-    return Response(status=HTTP_200_OK)
+    return Response(serializer.data, status=HTTP_200_OK)
