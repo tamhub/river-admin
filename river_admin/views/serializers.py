@@ -29,7 +29,7 @@ class LoginDto(serializers.ModelSerializer):
 class UserDto(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_superuser']
 
 
 class PermissionDto(serializers.ModelSerializer):
@@ -223,10 +223,7 @@ class FeatureSettingDto(serializers.ModelSerializer):
 
     class Meta:
         model = FeatureSetting
-        fields = ['feature', 'feature_display', 'is_enabled']
+        fields = ['id', 'feature', 'feature_display', 'is_enabled']
 
     def get_feature_display(self, obj):
         return obj.get_feature_display()  # Get the human-readable value
-
-    def create(self, validated_data):
-        return FeatureSetting.objects.get_or_create(**validated_data)[0]
