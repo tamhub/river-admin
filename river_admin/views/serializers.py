@@ -6,6 +6,8 @@ from river.models import Function, OnApprovedHook, State, TransitionApprovalMeta
 
 # Custom Usermodel support patch
 from django.contrib.auth import get_user_model
+from river.models.feature_panel import FeatureSetting
+
 User = get_user_model()
 
 from river.models.hook import AFTER, BEFORE
@@ -214,3 +216,17 @@ class TransitionApprovalDto(serializers.ModelSerializer):
 class WorkflowObjectStateDto(serializers.Serializer):
     iteration = serializers.IntegerField()
     state = StateDto()
+
+
+class FeatureSettingDto(serializers.ModelSerializer):
+    feature_display = serializers.SerializerMethodField()  # Add display field
+
+    class Meta:
+        model = FeatureSetting
+        fields = ['feature', 'feature_display', 'is_enabled']
+
+    def get_feature_display(self, obj):
+        return obj.get_feature_display()  # Get the human-readable value
+
+    def create(self, validated_data):
+        return FeatureSetting.objects.get_or_create(**validated_data)[0]
