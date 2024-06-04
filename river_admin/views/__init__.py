@@ -115,6 +115,7 @@ from .transition_view import *
 from .transition_approval_view import *
 from .workflow_object_view import *
 from .approval_view import *
+from .feature_panel_view import *
 
 @get(
     r'river-admin/', authentication_classes=[],
