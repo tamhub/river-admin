@@ -33,11 +33,14 @@ class RiverAdmin(object):
     @classproperty
     def admin_list_displays(cls):
         from river.models.feature_panel import FeatureSetting
-        if not FeatureSetting.objects.filter(
-                feature=FeatureSetting.FeatureChoices.USERNAME_COLUMN, is_enabled=True
-        ).exists():
-            cls.list_displays = [display for display in cls.list_displays if display != "username"]
-        return cls.list_displays or ["pk", cls._field_name]
+        if hasattr(cls, 'list_displays') and isinstance(cls.list_displays, list):
+            if not FeatureSetting.objects.filter(
+                    feature=FeatureSetting.FeatureChoices.USERNAME_COLUMN, is_enabled=True
+            ).exists():
+                cls.list_displays = [display for display in cls.list_displays if display != "username"]
+            return cls.list_displays or ["pk", getattr(cls, '_field_name', 'default_field_name')]
+        else:
+            return ["pk", getattr(cls, '_field_name', 'default_field_name')]
 
     @classmethod
     def get_objects(cls, state=None):
