@@ -1,3 +1,5 @@
+from river.models.feature_panel import FeatureSetting
+
 from river_admin.site import Site
 
 
@@ -32,6 +34,10 @@ class RiverAdmin(object):
 
     @classproperty
     def admin_list_displays(cls):
+        if not FeatureSetting.objects.filter(
+                feature=FeatureSetting.FeatureChoices.USERNAME_COLUMN, is_enabled=True
+        ).exists():
+            cls.list_displays = [display for display in cls.list_displays if display != "username"]
         return cls.list_displays or ["pk", cls._field_name]
 
     @classmethod
