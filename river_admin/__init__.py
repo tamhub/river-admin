@@ -1,5 +1,3 @@
-from river.models.feature_panel import FeatureSetting
-
 from river_admin.site import Site
 
 
@@ -34,6 +32,7 @@ class RiverAdmin(object):
 
     @classproperty
     def admin_list_displays(cls):
+        from river.models.feature_panel import FeatureSetting
         if not FeatureSetting.objects.filter(
                 feature=FeatureSetting.FeatureChoices.USERNAME_COLUMN, is_enabled=True
         ).exists():
