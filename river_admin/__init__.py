@@ -35,7 +35,7 @@ class RiverAdmin(object):
         from river.models.feature_panel import FeatureSetting
         if hasattr(cls, 'list_displays') and isinstance(cls.list_displays, list):
             if not FeatureSetting.objects.filter(
-                    feature=FeatureSetting.FeatureChoices.USERNAME_COLUMN, is_enabled=True
+                    feature='username_column', is_enabled=True
             ).exists():
                 cls.list_displays = [display for display in cls.list_displays if display != "username"]
             return cls.list_displays or ["pk", getattr(cls, '_field_name', 'default_field_name')]
