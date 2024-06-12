@@ -95,7 +95,7 @@ class WorkflowStateFieldDto(serializers.Serializer):
 class CreateWorkflowDto(serializers.ModelSerializer):
     class Meta:
         model = Workflow
-        fields = ["content_type", "field_name", "initial_state"]
+        fields = ["content_type", "field_name", "initial_state", "title", "description"]
 
 
 # TRANSITION META
