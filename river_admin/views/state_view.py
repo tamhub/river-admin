@@ -18,7 +18,7 @@ def get_state(request, pk):
 
 @get(r'state/list/')
 def list_states(request):
-    slug = request.GET.get('slug').lower()
+    slug = request.GET.get('slug').lower() if request.GET.get('slug') else None
     if slug:
         states = State.objects.filter(slug__contains=slug)
     else:
