@@ -35,7 +35,7 @@ class RiverAdmin(object):
         from river.models.feature_panel import FeatureSetting
         instance = cls()
         if hasattr(instance, 'list_displays') and isinstance(instance.list_displays, list):
-            if not FeatureSetting.objects.filter(
+            if not FeatureSetting._base_manager.filter(
                     feature='username_column', is_enabled=True
             ).exists():
                 instance.list_displays = [display for display in instance.list_displays if display != "username"]
@@ -46,7 +46,7 @@ class RiverAdmin(object):
     @classmethod
     def get_objects(cls, state=None):
         headers = cls.admin_list_displays
-        for obj in cls._model_class.objects.filter(**{cls._field_name: state} if state else {}):
+        for obj in cls._model_class._base_manager.filter(**{cls._field_name: state} if state else {}):
             yield dict({key: str(cls._get_value(obj, key)) for key in headers}, **cls._get_default_values(obj))
 
     @classmethod
