@@ -66,7 +66,7 @@ class ModelFetcher:
         Returns:
         The model instance.
         """
-        return get_object_or_404(model_class.objects.all(), pk=object_id)
+        return get_object_or_404(model_class._base_manager.all(), pk=object_id)
 
 
 class StateFieldUtil:
