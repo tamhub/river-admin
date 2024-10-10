@@ -1,11 +1,24 @@
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
-from river.models import Function, OnApprovedHook, State, TransitionApprovalMeta, \
-    OnTransitHook, TransitionMeta, Transition, Workflow, TransitionApproval, DONE, CANCELLED
+from river.models import (
+    Function,
+    OnApprovedHook,
+    State,
+    TransitionApprovalMeta,
+    OnTransitHook,
+    TransitionMeta,
+    Transition,
+    Workflow,
+    TransitionApproval,
+    DONE,
+    CANCELLED,
+)
 
 # Custom Usermodel support patch
 from django.contrib.auth import get_user_model
+from river.models.feature_panel import FeatureSetting
+
 User = get_user_model()
 
 from river.models.hook import AFTER, BEFORE
@@ -15,7 +28,7 @@ from river.models.hook import AFTER, BEFORE
 class ContentTypeDto(serializers.ModelSerializer):
     class Meta:
         model = ContentType
-        fields = ['id', 'app_label', 'model']
+        fields = ["id", "app_label", "model"]
 
 
 # AUTH
@@ -27,32 +40,32 @@ class LoginDto(serializers.ModelSerializer):
 class UserDto(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+        fields = ["id", "username", "first_name", "last_name", "email", "is_superuser"]
 
 
 class PermissionDto(serializers.ModelSerializer):
     class Meta:
         model = Permission
-        fields = ['id', 'content_type', 'name', 'codename']
+        fields = ["id", "content_type", "name", "codename"]
 
 
 class GroupDto(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['id', 'name']
+        fields = ["id", "name"]
 
 
 # STATE
 class StateDto(serializers.ModelSerializer):
     class Meta:
         model = State
-        fields = ['id', 'label', "slug", "description"]
+        fields = ["id", "label", "slug", "description"]
 
 
 class CreateStateDto(serializers.ModelSerializer):
     class Meta:
         model = State
-        fields = ['label']
+        fields = ["label"]
 
 
 # WORKFLOW
@@ -64,16 +77,27 @@ class WorkflowDto(serializers.ModelSerializer):
 
     class Meta:
         model = Workflow
-        fields = ['id', 'content_type', 'initial_state', 'field_name', 'admin_name', 'admin_icon']
+        fields = [
+            "id",
+            "content_type",
+            "initial_state",
+            "field_name",
+            "admin_name",
+            "admin_icon",
+            "title",
+            "description",
+        ]
 
     def get_admin_name(self, obj):
         from river_admin import site
+
         model_class = obj.content_type.model_class()
         registered_admin = site.get(model_class, obj.field_name)
         return registered_admin.name if registered_admin else None
 
     def get_admin_icon(self, obj):
         from river_admin import site
+
         model_class = obj.content_type.model_class()
         registered_admin = site.get(model_class, obj.field_name)
         return registered_admin.icon if registered_admin else None
@@ -93,20 +117,20 @@ class WorkflowStateFieldDto(serializers.Serializer):
 class CreateWorkflowDto(serializers.ModelSerializer):
     class Meta:
         model = Workflow
-        fields = ["content_type", "field_name", "initial_state"]
+        fields = ["content_type", "field_name", "initial_state", "title", "description"]
 
 
 # TRANSITION META
 class TransitionMetaDto(serializers.ModelSerializer):
     class Meta:
         model = TransitionMeta
-        fields = ['id', 'workflow', 'source_state', 'destination_state', 'name']
+        fields = ["id", "workflow", "source_state", "destination_state", "name"]
 
 
 class CreateTransitionMetaDto(serializers.ModelSerializer):
     class Meta:
         model = TransitionMeta
-        fields = ["workflow", "source_state", "destination_state", 'name']
+        fields = ["workflow", "source_state", "destination_state", "name"]
 
 
 # TRANSITION APPROVAL META
@@ -116,13 +140,20 @@ class TransitionApprovalMetaDto(serializers.ModelSerializer):
 
     class Meta:
         model = TransitionApprovalMeta
-        fields = ['id', 'workflow', 'transition_meta', 'permissions', 'groups', 'priority']
+        fields = [
+            "id",
+            "workflow",
+            "transition_meta",
+            "permissions",
+            "groups",
+            "priority",
+        ]
 
 
 class CreateTransitionApprovalMetaDto(serializers.ModelSerializer):
     class Meta:
         model = TransitionApprovalMeta
-        fields = ['workflow', 'transition_meta', 'permissions', 'groups', 'priority']
+        fields = ["workflow", "transition_meta", "permissions", "groups", "priority"]
 
 
 class RePrioritizeTransitionApprovalMetaDto(serializers.Serializer):
@@ -134,19 +165,19 @@ class RePrioritizeTransitionApprovalMetaDto(serializers.Serializer):
 class FunctionDto(serializers.ModelSerializer):
     class Meta:
         model = Function
-        fields = ['id', 'name', 'body', 'version', 'date_created', 'date_updated']
+        fields = ["id", "name", "body", "version", "date_created", "date_updated"]
 
 
 class CreateFunctionDto(serializers.ModelSerializer):
     class Meta:
         model = Function
-        fields = ['name', 'body']
+        fields = ["name", "body"]
 
 
 class UpdateFunctionDto(serializers.ModelSerializer):
     class Meta:
         model = Function
-        fields = ['name', 'body']
+        fields = ["name", "body"]
 
 
 # TRANSITION HOOK
@@ -155,7 +186,13 @@ class TransitionHookDto(serializers.ModelSerializer):
 
     class Meta:
         model = OnTransitHook
-        fields = ['id', 'callback_function', 'transition_meta', 'transition', 'object_id']
+        fields = [
+            "id",
+            "callback_function",
+            "transition_meta",
+            "transition",
+            "object_id",
+        ]
 
 
 class CreateTransitionHookDto(serializers.ModelSerializer):
@@ -163,7 +200,15 @@ class CreateTransitionHookDto(serializers.ModelSerializer):
 
     class Meta:
         model = OnTransitHook
-        fields = ['workflow', 'callback_function', 'transition_meta', 'transition', 'object_id', 'content_type', 'hook_type']
+        fields = [
+            "workflow",
+            "callback_function",
+            "transition_meta",
+            "transition",
+            "object_id",
+            "content_type",
+            "hook_type",
+        ]
 
 
 # APPROVAL HOOK
@@ -172,7 +217,13 @@ class ApprovalHookDto(serializers.ModelSerializer):
 
     class Meta:
         model = OnApprovedHook
-        fields = ['id', 'callback_function', 'transition_approval_meta', 'transition_approval', 'object_id']
+        fields = [
+            "id",
+            "callback_function",
+            "transition_approval_meta",
+            "transition_approval",
+            "object_id",
+        ]
 
 
 class CreateApprovalHookDto(serializers.ModelSerializer):
@@ -180,7 +231,15 @@ class CreateApprovalHookDto(serializers.ModelSerializer):
 
     class Meta:
         model = OnApprovedHook
-        fields = ['workflow', 'callback_function', 'transition_approval_meta', 'transition_approval', 'object_id', 'content_type', 'hook_type']
+        fields = [
+            "workflow",
+            "callback_function",
+            "transition_approval_meta",
+            "transition_approval",
+            "object_id",
+            "content_type",
+            "hook_type",
+        ]
 
 
 # TRANSITION
@@ -190,7 +249,17 @@ class TransitionDto(serializers.ModelSerializer):
 
     class Meta:
         model = Transition
-        fields = ['id', 'workflow', 'source_state', 'destination_state', 'iteration', 'meta', 'object_id', 'is_done', 'is_cancelled']
+        fields = [
+            "id",
+            "workflow",
+            "source_state",
+            "destination_state",
+            "iteration",
+            "meta",
+            "object_id",
+            "is_done",
+            "is_cancelled",
+        ]
 
     def get_is_done(self, obj):
         return obj.status == DONE
@@ -206,11 +275,34 @@ class TransitionApprovalDto(serializers.ModelSerializer):
 
     class Meta:
         model = TransitionApproval
-        fields = ['id', 'workflow', 'transition', 'permissions', 'groups', 'priority', 'status', 'transactioner', 'meta', 'object_id']
+        fields = [
+            "id",
+            "workflow",
+            "transition",
+            "permissions",
+            "groups",
+            "priority",
+            "status",
+            "transactioner",
+            "meta",
+            "object_id",
+        ]
 
 
 # WORKFLOW OBJECT
 
+
 class WorkflowObjectStateDto(serializers.Serializer):
     iteration = serializers.IntegerField()
     state = StateDto()
+
+
+class FeatureSettingDto(serializers.ModelSerializer):
+    feature_display = serializers.SerializerMethodField()  # Add display field
+
+    class Meta:
+        model = FeatureSetting
+        fields = ["id", "feature", "feature_display", "is_enabled"]
+
+    def get_feature_display(self, obj):
+        return obj.get_feature_display()  # Get the human-readable value
