@@ -11,7 +11,7 @@ from examples.shipping_example.models import Shipping
 
 
 def _approve(user, model_class, field_name, pk, return_page, next_state_id=None):
-    item = get_object_or_404(model_class.objects.all(), pk=pk)
+    item = get_object_or_404(model_class._base_manager.all(), pk=pk)
     next_state = get_object_or_404(State, pk=next_state_id)
 
     try:

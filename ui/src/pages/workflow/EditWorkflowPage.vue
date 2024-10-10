@@ -196,15 +196,17 @@ export default {
         var transition_meta_fetcher = http.get(
           `/workflow/transition-meta/list/${workflow_id}/`,
           (result) => {
-            this.transitions = result.data.map((transition) =>
-              Transition.of(
-                transition.id,
-                this.workflow,
-                transition.source_state,
-                transition.destination_state,
-                transition.name
+            this.transitions = result.data
+              .map((transition) =>
+                Transition.of(
+                  transition.id,
+                  this.workflow,
+                  transition.source_state,
+                  transition.destination_state,
+                  transition.name
+                )
               )
-            );
+              .sort((a, b) => a.id - b.id);
           }
         );
 
