@@ -125,4 +125,4 @@ export default {
 </script>
 
 
-https://core.verse-stg.tam.run/api/auth/login?next=https://core.verse-stg.tam.run/river-admin/loading?from=https://core.verse-stg.tam.run/river-admin/ 
+https://maded.tam.run//api/auth/login?next=https://maded.tam.run//river-admin/loading?from=https://maded.tam.run/river-admin/
