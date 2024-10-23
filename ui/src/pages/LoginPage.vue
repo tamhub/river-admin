@@ -126,4 +126,4 @@ export default {
 
 
 
-https://engage.moc.gov.sa/madeed-test/api/auth/login?next=https://engage.moc.gov.sa/madeed-test//river-admin/loading?from=https://engage.moc.gov.sa/madeed-test/river-admin/
+https://engage.moc.gov.sa/madeed-test/api/auth/login/?next=https://engage.moc.gov.sa/madeed-test/river-admin/loading?from=https://engage.moc.gov.sa/madeed-test/river-admin/
