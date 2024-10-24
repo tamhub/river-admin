@@ -117,7 +117,7 @@ export default {
     const from = window.location.origin + extra + '';
     const next = window.location.origin + extra + '/loading';
 
-    const url = `${BASE_URL}/api/auth/login?next=${next}?from=${from}`;
+    const url = `${BASE_URL}/auth/forms/login/?next=${next}?from=${from}`;
     window.location.replace(url);
 
   },
@@ -126,4 +126,4 @@ export default {
 
 
 
-https://engage.moc.gov.sa/madeed-test/api/auth/login/?next=https://engage.moc.gov.sa/madeed-test/river-admin/loading?from=https://engage.moc.gov.sa/madeed-test/river-admin/
+https://engage.moc.gov.sa/madeed-test/auth/forms/login/?next=https://engage.moc.gov.sa/madeed-test/river-admin/loading?from=https://engage.moc.gov.sa/madeed-test/river-admin/
