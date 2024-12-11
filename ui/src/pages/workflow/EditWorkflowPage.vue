@@ -26,8 +26,8 @@
           />
         </v-col>
       </v-row>
-      <div class="flex items-center ">
-        <div class="flex items-start justify-start gap-3 pt-2 ">
+      <div class="flex items-center gap-4">
+        <div class="flex items-start justify-start gap-3 pt-2 flex-nowrap">
           <div class="max-w-[500px] w-full">
             <StateInput
               :disabled="!selected_state"
@@ -80,7 +80,7 @@
             </v-btn>
           </div>
         </div>
-        <div class="flex items-start justify-start gap-3 pt-2 ">
+        <div class="flex items-start justify-start gap-3 pt-2 flex-nowrap">
           <div class="max-w-[500px] w-full">
             <v-text-field
               class="pt-0 mt-0"
